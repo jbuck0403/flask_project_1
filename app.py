@@ -63,7 +63,11 @@ def displayPokemon():
 
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
-            print("working")
+            if type(spriteURL) == type(None):
+                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items())
+            if type(spriteShinyURL) == type(None):
+                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
+
             return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
         
     else:

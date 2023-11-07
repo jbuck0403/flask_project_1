@@ -19,18 +19,12 @@
         {% endif %}
         {% if pokemonInfoDict %}
           <div class="pokemon-data-container">
-            <div class="sprite-container">
-              <img src="{{ spriteURL }}"
-                   alt="{{ pokemonInfoDict.name }}"
-                   class="sprite"
-                   height=""
-                   width="" />
-              <img src="{{ spriteShinyURL }}"
-                   alt="{{ pokemonInfoDict.name }}"
-                   class="sprite"
-                   height=""
-                   width="">
-            </div>
+            {% if spriteURL %}
+              <div class="sprite-container">
+                <img src="{{ spriteURL }}" alt="" class="sprite" height="" width="" />
+                {% if spriteShinyURL %}<img src="{{ spriteShinyURL }}" alt="" class="sprite" height="" width="">{% endif %}
+              </div>
+            {% endif %}
             <table class="pokemon-data">
               {% for dataLabel, data in pokemonInfoDict %}
                 <tr>
