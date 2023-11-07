@@ -1,0 +1,117 @@
+:root {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: "orange-kid";
+  src: url("./orange-kid.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: "orange-kid", sans-serif;
+  background-color: rgb(28, 27, 27);
+  color: white;
+  font-size: 60px;
+}
+
+.header-container {
+  display: flex;
+}
+
+.masterball-flipped {
+  transform: scaleX(-1);
+}
+
+.sprite {
+  height: 300px;
+  width: auto;
+}
+
+.sprite-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.pokemon-data {
+  margin: 20px;
+  padding: 20px;
+  font-size: 50px;
+}
+
+.pokemon-data-container {
+  display: flex;
+}
+
+.content-wrapper {
+  border: 1px solid red;
+  border-radius: 10px;
+}
+
+.data-label {
+  padding-right: 30px;
+  text-align: right;
+}
+
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+}
+
+.input-container input {
+  border-radius: 8px;
+  width: 50%;
+  height: 40px;
+  padding-left: 20px;
+  margin-top: 10px;
+  font-size: 30px;
+  text-align: center;
+  background-color: rgb(60, 59, 59);
+  color: white;
+  border: none;
+}
+
+.input-container input:focus {
+  outline: none;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+}
+
+.pokedex-button {
+  height: 80px;
+  width: 240px;
+  border-radius: 10px;
+  background-color: rgb(249, 46, 46);
+  color: white;
+  font-size: 60px;
+  font-family: "orange-kid";
+}
+
+.pokedex-button:hover {
+  color: rgb(249, 46, 46);
+  background-color: white;
+}
+
+.pokedex-button:active {
+  transform: translate(3px, 3px);
+}
+
+.welcome-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

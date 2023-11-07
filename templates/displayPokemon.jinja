@@ -1,0 +1,47 @@
+{% extends "base.jinja" %}
+{% block content %}
+  <div class="app-container">
+    <div>
+      <div class="content-wrapper">
+        <form method="post">
+          <div class="input-container">
+            <label for="pokemonID">Enter Pokemon</label>
+            <input type="text" id="pokemonID" name="id">
+          </div>
+        </form>
+        {% if connectErrorCode %}{{ connectErrorCode }}{% endif %}
+        {% if errorCode %}
+          <div class="error">
+            <img src="{{ sprite }}" alt="" height="" width="" class="sprite">
+            <div>Oops...</div>
+            <div>Couldn't find that one...</div>
+          </div>
+        {% endif %}
+        {% if pokemonInfoDict %}
+          <div class="pokemon-data-container">
+            <div class="sprite-container">
+              <img src="{{ spriteURL }}"
+                   alt="{{ pokemonInfoDict.name }}"
+                   class="sprite"
+                   height=""
+                   width="" />
+              <img src="{{ spriteShinyURL }}"
+                   alt="{{ pokemonInfoDict.name }}"
+                   class="sprite"
+                   height=""
+                   width="">
+            </div>
+            <table class="pokemon-data">
+              {% for dataLabel, data in pokemonInfoDict %}
+                <tr>
+                  <td class="data-label">{{ dataLabel }}</td>
+                  <td class="data">{{ data }}</td>
+                </tr>
+              {% endfor %}
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}
