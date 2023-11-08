@@ -1,6 +1,7 @@
 from flask import request, render_template, redirect
 import requests
 from app import app
+from app.forms import PokedexInputForm
 
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
@@ -17,27 +18,29 @@ def displayPokemon():
         response = requests.get(url)
 
         if not response.ok:
-            return render_template('displayPokemon.jinja', connectErrorCode=response.status_code)
+            return render_template('displayPokemon.jinja', connectErrorCode=response.status_code, form=form)
 
         data = response.json()
         sprite = data['sprites']['front_default']
-        return render_template('displayPokemon.jinja', errorCode=errorCode, sprite=sprite)
+        return render_template('displayPokemon.jinja', errorCode=errorCode, sprite=sprite, form=form)
 
+    form = PokedexInputForm()
 
-    if request.method == "POST":
+    if request.method == "POST" and form.validate_on_submit():
 
-        id = request.form.get("id")
-
+        id = form.pokedexInput.data
 
         url = f"https://pokeapi.co/api/v2/pokemon/{id}"
         response = requests.get(url)
+
         errorCode = response.status_code
         
-        if not response.ok or id == '':
+        if not response.ok:
             return returnDitto(errorCode)
             
         else:
             data = response.json()
+            print(data['sprites']['front_default'])
 
             name = data['name'].title()
             abilities = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == False]
@@ -53,6 +56,8 @@ def displayPokemon():
             pokemonType = [pkmnType['type']['name'].title() for pkmnType in data['types']]
             pokedexID = data['id']
 
+            print(spriteURL)
+
             pokemonType = f"{pokemonType[0]}{'/' + pokemonType[1] if len(pokemonType) > 1 else ''}"
 
             labels = ["Name:", "ID:", "Type:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:"] + list(baseStats.keys())
@@ -61,11 +66,11 @@ def displayPokemon():
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
             if type(spriteURL) == type(None):
-                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items())
+                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), form=form)
             if type(spriteShinyURL) == type(None):
-                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
+                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, form=form)
 
-            return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
+            return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL, form=form)
         
     else:
-        return render_template('displayPokemon.jinja')
+        return render_template('displayPokemon.jinja', form=form)

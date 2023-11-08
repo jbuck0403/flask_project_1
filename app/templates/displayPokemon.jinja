@@ -7,9 +7,12 @@
     <div>
       <div class="content-wrapper">
         <form method="post">
+          {{ form.hidden_tag() }}
           <div class="input-container">
-            <label for="pokemonID">Enter Pokemon</label>
-            <input type="text" id="pokemonID" name="id">
+            {# <label for="pokemonID">Enter Pokemon</label> #}
+            {{ form.pokedexInput.label(for="pokemonID") }}
+            {# <input type="text" id="pokemonID" name="id"> #}
+            {{ form.pokedexInput(id="pokemonID") }}
           </div>
         </form>
         {% if connectErrorCode %}{{ connectErrorCode }}{% endif %}
