@@ -56,8 +56,6 @@ def displayPokemon():
             pokemonType = [pkmnType['type']['name'].title() for pkmnType in data['types']]
             pokedexID = data['id']
 
-            print(spriteURL)
-
             pokemonType = f"{pokemonType[0]}{'/' + pokemonType[1] if len(pokemonType) > 1 else ''}"
 
             labels = ["Name:", "ID:", "Type:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:"] + list(baseStats.keys())
@@ -65,9 +63,12 @@ def displayPokemon():
 
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
-            if type(spriteURL) == type(None):
+            spriteResponse = requests.get(spriteURL)
+            shinySpriteResponse = requests.get(spriteShinyURL)
+
+            if not spriteResponse.ok:
                 return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), form=form)
-            if type(spriteShinyURL) == type(None):
+            if not shinySpriteResponse.ok:
                 return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, form=form)
 
             return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL, form=form)
