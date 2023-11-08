@@ -13,16 +13,22 @@ def landingPage():
 
 @app.route("/pokedex", methods=['GET', 'POST'])
 def displayPokemon():
+    def render_pokedex(**kwargs):
+        form.pokedexInput.data = ""
+        return render_template('displayPokemon.jinja', form=form, bulbaNameURL=bulbaNameURL, **kwargs)
+
     def returnDitto(errorCode):
         url = f"https://pokeapi.co/api/v2/pokemon/ditto"
         response = requests.get(url)
 
         if not response.ok:
-            return render_template('displayPokemon.jinja', connectErrorCode=response.status_code, form=form)
+
+            return render_pokedex(connectErrorCode=response.status_code)
 
         data = response.json()
         sprite = data['sprites']['front_default']
-        return render_template('displayPokemon.jinja', errorCode=errorCode, sprite=sprite, form=form)
+
+        return render_pokedex(errorCode=errorCode, sprite=sprite)
 
     form = PokedexInputForm()
 
@@ -40,7 +46,6 @@ def displayPokemon():
             
         else:
             data = response.json()
-            print(data['sprites']['front_default'])
 
             name = data['name'].title()
             abilities = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == False]
@@ -60,22 +65,21 @@ def displayPokemon():
 
             labels = ["Name:", "ID:", "Type:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:"] + list(baseStats.keys())
             pkmnInfo = [name, pokedexID, pokemonType, abilities[0], abilities[1] if len(abilities) > 1 else 'None', hiddenAbility, baseExp] + list(baseStats.values())
-
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
-            
+            bulbaNameURL = f"https://bulbapedia.bulbagarden.net/wiki/{name}_(Pok%C3%A9mon)"
+
             if spriteURL != None:
                 spriteResponse = requests.get(spriteURL)
             if spriteShinyURL != None:
                 shinySpriteResponse = requests.get(spriteShinyURL)
 
-
             if  spriteURL == None or not spriteResponse.ok:
-                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), form=form)
+                return render_pokedex(pokemonInfoDict=pokemonInfoDict.items())
             if  spriteShinyURL == None or not shinySpriteResponse.ok:
-                return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, form=form)
+                return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
 
-            return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL, form=form)
+            return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
         
     else:
-        return render_template('displayPokemon.jinja', form=form)
+        return render_pokedex()

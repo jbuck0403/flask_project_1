@@ -9,9 +9,7 @@
         <form method="post">
           {{ form.hidden_tag() }}
           <div class="input-container">
-            {# <label for="pokemonID">Enter Pokemon</label> #}
             {{ form.pokedexInput.label(for="pokemonID") }}
-            {# <input type="text" id="pokemonID" name="id"> #}
             {{ form.pokedexInput(id="pokemonID") }}
           </div>
         </form>
@@ -34,8 +32,15 @@
             <table class="pokemon-data">
               {% for dataLabel, data in pokemonInfoDict %}
                 <tr>
-                  <td class="data-label">{{ dataLabel }}</td>
-                  <td class="data">{{ data }}</td>
+                  {% if dataLabel == 'Name:' %}
+                    <td class="data-label">{{ dataLabel }}</td>
+                    <td>
+                      <a href="{{ bulbaNameURL }}" target="_blank" class="data data-link">{{ data }}</a>
+                    </td>
+                  {% else %}
+                    <td class="data-label">{{ dataLabel }}</td>
+                    <td class="data">{{ data }}</td>
+                  {% endif %}
                 </tr>
               {% endfor %}
             </table>
