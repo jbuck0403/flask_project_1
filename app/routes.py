@@ -63,12 +63,16 @@ def displayPokemon():
 
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
-            spriteResponse = requests.get(spriteURL)
-            shinySpriteResponse = requests.get(spriteShinyURL)
+            
+            if spriteURL != None:
+                spriteResponse = requests.get(spriteURL)
+            if spriteShinyURL != None:
+                shinySpriteResponse = requests.get(spriteShinyURL)
 
-            if not spriteResponse.ok:
+
+            if  spriteURL == None or not spriteResponse.ok:
                 return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), form=form)
-            if not shinySpriteResponse.ok:
+            if  spriteShinyURL == None or not shinySpriteResponse.ok:
                 return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, form=form)
 
             return render_template('displayPokemon.jinja', pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL, form=form)
