@@ -2,10 +2,15 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, ValidationError
 from app.users import REGISTERED_USERS
+import re
+
+def verifyAllowedInput(_, userInput):
+    pattern = re.compile(r'^[a-zA-Z0-9]+$')
+    if not pattern.match(userInput.data):
+        raise ValidationError("Only letters and numbers...")
 
 class PokedexInputForm(FlaskForm):
-    pokedexInput = StringField('Enter Pokémon', validators=[DataRequired()])
-
+    pokedexInput = StringField('Enter Pokémon', validators=[DataRequired(), verifyAllowedInput])
 
 class LoginForm(FlaskForm):
     userName = StringField("User Name:", validators=[DataRequired()])
