@@ -1,7 +1,8 @@
 from flask import request, render_template, redirect
 import requests, random
 from app import app
-from app.forms import PokedexInputForm
+from app.forms import PokedexInputForm, LoginForm, SignupForm
+from app.users import REGISTERED_USERS
 
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
@@ -10,11 +11,36 @@ def landingPage():
     else:
         return render_template('landingPage.jinja')
 
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    print(REGISTERED_USERS.keys())
+
+    if request.method == "POST":
+        if "loginBtn" in request.form and form.validate_on_submit():
+            return "Successfully logged in!"
+        elif "signupBtn" in request.form:
+            return redirect("/signup")
+        
+    else:
+        return render_template('login.jinja', form=form)
+
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+
+    if request.method == "POST" and form.validate_on_submit():
+        REGISTERED_USERS[form.userName.data] = form.password
+        return redirect('/login')
+    else:
+        return render_template('signup.jinja', form=form)
+
+
 @app.route("/pokedex", methods=['GET', 'POST'])
-def displayPokemon():
+def pokedex():
     def render_pokedex(**kwargs):
         form.pokedexInput.data = ""
-        return render_template('displayPokemon.jinja', form=form, bulbaURL=bulbaURL, **kwargs)
+        return render_template('pokedex.jinja', form=form, bulbaURL=bulbaURL, **kwargs)
 
     def unownSpeller(wordToSpell="oops"):
         errorMessages = ['oops', 'sorry', '?', 'huh', 'nani']

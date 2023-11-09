@@ -1,0 +1,35 @@
+{% extends "base.jinja" %}
+{% block title %}
+  Sign Up
+{% endblock title %}
+{% block content %}
+  <div class="login-container">
+    <div>
+      <form method="post" class="login-form">
+        {{ form.hidden_tag() }}
+        <div class="form-error">
+          {% if form.confirmPassword.errors %}
+            {% for error in form.confirmPassword.errors %}{{ error }}{% endfor %}
+          {% elif form.userName.errors %}
+            {% for error in form.userName.errors %}{{ error }}{% endfor %}
+          {% elif form.password.errors %}
+            {% for error in form.password.errors %}{{ error }}{% endfor %}
+          {% endif %}
+        </div>
+        <div class="login-wrapper">
+          <div class="login">
+            {{ form.userName.label }}
+            {{ form.password.label }}
+            {{ form.confirmPassword.label }}
+          </div>
+          <div class="login-field-container">
+            {{ form.userName(class="field") }}
+            {{ form.password(class="field") }}
+            {{ form.confirmPassword(class="field") }}
+          </div>
+        </div>
+        <div class="btn-wrapper">{{ form.createAccountBtn(class="btn sign-in-btn") }}</div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}
