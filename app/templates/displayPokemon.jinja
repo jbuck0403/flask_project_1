@@ -16,8 +16,14 @@
         {% if connectErrorCode %}{{ connectErrorCode }}{% endif %}
         {% if errorCode %}
           <div class="error">
-            <img src="{{ sprite }}" alt="" height="" width="" class="sprite">
-            <div>Oops...</div>
+            {% if unownWord %}
+              <div>
+                {% for sprite in unownWord %}<img src="{{ sprite }}" alt="" height="" width="" class="sprite">{% endfor %}
+              </div>
+            {% else %}
+              <img src="{{ sprite }}" alt="" height="" width="" class="sprite">
+              <div>Oops...</div>
+            {% endif %}
             <div>Couldn't find that one...</div>
           </div>
         {% endif %}
@@ -35,7 +41,7 @@
                   {% if dataLabel == 'Name:' %}
                     <td class="data-label">{{ dataLabel }}</td>
                     <td>
-                      <a href="{{ bulbaNameURL }}" target="_blank" class="data data-link">{{ data }}</a>
+                      <a href="{{ bulbaURL }}" target="_blank" class="data data-link">{{ data }}</a>
                     </td>
                   {% else %}
                     <td class="data-label">{{ dataLabel }}</td>

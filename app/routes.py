@@ -1,12 +1,11 @@
 from flask import request, render_template, redirect
-import requests
+import requests, random
 from app import app
 from app.forms import PokedexInputForm
 
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
     if request.method == "POST":
-        #return render_template('displayPokemon.jinja')
         return redirect("/pokedex")
     else:
         return render_template('landingPage.jinja')
@@ -15,34 +14,50 @@ def landingPage():
 def displayPokemon():
     def render_pokedex(**kwargs):
         form.pokedexInput.data = ""
-        return render_template('displayPokemon.jinja', form=form, bulbaNameURL=bulbaNameURL, **kwargs)
+        return render_template('displayPokemon.jinja', form=form, bulbaURL=bulbaURL, **kwargs)
 
-    def returnDitto(errorCode):
-        url = f"https://pokeapi.co/api/v2/pokemon/ditto"
+    def unownSpeller(wordToSpell="oops"):
+        errorMessages = ['oops', 'sorry', '?', 'huh', 'nani']
+        if wordToSpell == True:
+           wordToSpell = errorMessages[random.randint(0,len(errorMessages) - 1)]
+        
+        if wordToSpell == '?':
+            unownIndexes = [10027]
+        else:
+            unownIndexes = [(ord(char) - 97) + 10000 if char != 'a' else 201 for char in wordToSpell.lower()]
+        
+        return [returnSpriteURL(pkmn=index, pkmnType="pokemon-form") for index in unownIndexes]
+        
+    def returnSpriteURL(pkmn=10027, pkmnType="pokemon-form", shiny=False):
+        url = f"https://pokeapi.co/api/v2/{pkmnType}/{pkmn}"
         response = requests.get(url)
 
         if not response.ok:
+            return response.status_code
+        else:
+            data = response.json()
+            return data["sprites"][f"front_{'shiny' if shiny else 'default'}"]
 
-            return render_pokedex(connectErrorCode=response.status_code)
+    def renderSprite(errorCode, unownWord=False):
+        sprite = returnSpriteURL()
 
-        data = response.json()
-        sprite = data['sprites']['front_default']
+        if len(sprite) == 3:
+            return render_pokedex(connectErrorCode=sprite)
 
-        return render_pokedex(errorCode=errorCode, sprite=sprite)
+        else:
+            if unownWord:
+                return render_pokedex(errorCode=errorCode, unownWord=unownSpeller(unownWord))
+            else:
+                return render_pokedex(errorCode=errorCode, sprite=sprite)
 
-    form = PokedexInputForm()
-
-    if request.method == "POST" and form.validate_on_submit():
-
+    def returnPokemonData():
         id = form.pokedexInput.data
 
         url = f"https://pokeapi.co/api/v2/pokemon/{id}"
         response = requests.get(url)
 
-        errorCode = response.status_code
-        
         if not response.ok:
-            return returnDitto(errorCode)
+            return renderSprite, response.status_code 
             
         else:
             data = response.json()
@@ -67,19 +82,34 @@ def displayPokemon():
             pkmnInfo = [name, pokedexID, pokemonType, abilities[0], abilities[1] if len(abilities) > 1 else 'None', hiddenAbility, baseExp] + list(baseStats.values())
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
-            bulbaNameURL = f"https://bulbapedia.bulbagarden.net/wiki/{name}_(Pok%C3%A9mon)"
+        return pokemonInfoDict, spriteURL, spriteShinyURL
 
-            if spriteURL != None:
-                spriteResponse = requests.get(spriteURL)
-            if spriteShinyURL != None:
-                shinySpriteResponse = requests.get(spriteShinyURL)
 
-            if  spriteURL == None or not spriteResponse.ok:
-                return render_pokedex(pokemonInfoDict=pokemonInfoDict.items())
-            if  spriteShinyURL == None or not shinySpriteResponse.ok:
-                return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
+    form = PokedexInputForm()
+    bulbaURL = None
 
-            return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
+    if request.method == "POST" and form.validate_on_submit():
+
+        pokemonData = returnPokemonData()
+
+        if (callable(pokemonData[0])):
+            return pokemonData[0](pokemonData[1], unownWord=True)
+        else:
+            pokemonInfoDict, spriteURL, spriteShinyURL = pokemonData
+
+        bulbaURL = f"https://bulbapedia.bulbagarden.net/wiki/{pokemonInfoDict['Name:']}_(Pok%C3%A9mon)"
+
+        if spriteURL != None:
+            spriteResponse = requests.get(spriteURL)
+        if spriteShinyURL != None:
+            shinySpriteResponse = requests.get(spriteShinyURL)
+
+        if  spriteURL == None or not spriteResponse.ok:
+            return render_pokedex(pokemonInfoDict=pokemonInfoDict.items())
+        if  spriteShinyURL == None or not shinySpriteResponse.ok:
+            return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
+
+        return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
         
     else:
         return render_pokedex()
