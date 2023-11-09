@@ -40,8 +40,8 @@ def pokedex():
         form.pokedexInput.data = ""
         return render_template('pokedex.jinja', form=form, bulbaURL=bulbaURL, **kwargs)
 
-    def unownSpeller(wordToSpell="oops"):
-        errorMessages = ['oops', 'sorry', '?', 'huh', 'nani']
+    def unownSpeller(wordToSpell=True):
+        errorMessages = ['oops', 'sorry', '?', 'huh', 'nani', 'what', 'wtf']
         if wordToSpell == True:
            wordToSpell = errorMessages[random.randint(0,len(errorMessages) - 1)]
         
