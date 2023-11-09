@@ -1,5 +1,6 @@
 :root {
   box-sizing: border-box;
+  --primary-link-color: rgba(255, 0, 0, 0.236);
 }
 
 @font-face {
@@ -14,6 +15,27 @@ body {
   background-color: rgb(28, 27, 27);
   color: white;
   font-size: 60px;
+}
+
+.nav-bar {
+  display: flex;
+  position: absolute;
+  top: -5%;
+}
+
+.nav-bar li {
+  padding-left: 30px;
+  list-style-type: none;
+}
+
+.nav-bar li a {
+  font-size: 30px;
+  text-decoration: none;
+  color: var(--primary-link-color);
+}
+
+.nav-bar li a:hover {
+  color: white;
 }
 
 .header-container {
@@ -47,7 +69,7 @@ body {
 }
 
 .content-wrapper {
-  border: 1px solid red;
+  /* border: 1px solid red; */
   border-radius: 10px;
 }
 
@@ -124,7 +146,7 @@ body {
 
 .data-link:hover {
   text-decoration: underline;
-  color: rgb(249, 46, 46);
+  color: var(--primary-link-color);
 }
 
 .field {

@@ -5,6 +5,11 @@
 {% block content %}
   <div class="app-container">
     <div>
+      <div class="form-error">
+        {% if form.pokedexInput.errors %}
+          {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
+        {% endif %}
+      </div>
       <div class="content-wrapper">
         <form method="post">
           {{ form.hidden_tag() }}

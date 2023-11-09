@@ -13,6 +13,19 @@ class LoginForm(FlaskForm):
     loginBtn = SubmitField("Sign In")
     signupBtn = SubmitField("Create Account")
 
+    def validatePassword(self):
+        enteredUserName = self.userName.data
+        if enteredUserName not in REGISTERED_USERS.keys():
+            self.userName.errors.append('Invalid User Name...')
+            return False
+        
+        enteredPassword = self.password.data
+        if enteredPassword != REGISTERED_USERS[enteredUserName]:
+            self.password.errors.append('Invalid password...')
+            return False
+        else:
+            return True
+
 def verifyUniqueUserName(_, userName):
     if userName.data in REGISTERED_USERS.keys():
         raise ValidationError('User Name not available...')

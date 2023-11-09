@@ -14,23 +14,21 @@ def landingPage():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    print(REGISTERED_USERS.keys())
 
     if request.method == "POST":
-        if "loginBtn" in request.form and form.validate_on_submit():
-            return "Successfully logged in!"
+        if "loginBtn" in request.form and form.validate_on_submit() and form.validatePassword():
+            return redirect ("/")
         elif "signupBtn" in request.form:
             return redirect("/signup")
         
-    else:
-        return render_template('login.jinja', form=form)
+    return render_template('login.jinja', form=form)
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
     form = SignupForm()
 
     if request.method == "POST" and form.validate_on_submit():
-        REGISTERED_USERS[form.userName.data] = form.password
+        REGISTERED_USERS[form.userName.data] = form.password.data
         return redirect('/login')
     else:
         return render_template('signup.jinja', form=form)
@@ -77,12 +75,13 @@ def pokedex():
                 return render_pokedex(errorCode=errorCode, sprite=sprite)
 
     def returnPokemonData():
-        id = form.pokedexInput.data
+        id = form.pokedexInput.data.strip()
+        print(id)
 
         url = f"https://pokeapi.co/api/v2/pokemon/{id}"
         response = requests.get(url)
 
-        if not response.ok:
+        if not response.ok or id.isspace():
             return renderSprite, response.status_code 
             
         else:

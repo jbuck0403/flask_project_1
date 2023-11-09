@@ -5,6 +5,13 @@
 {% block content %}
   <div class="login-container">
     <div>
+      <div class="form-error">
+        {% if form.userName.errors %}
+          {% for error in form.userName.errors %}{{ error }}{% endfor %}
+        {% elif form.password.errors %}
+          {% for error in form.password.errors %}{{ error }}{% endfor %}
+        {% endif %}
+      </div>
       <form method="post" class="login-form">
         {{ form.hidden_tag() }}
         <div class="login-wrapper">
