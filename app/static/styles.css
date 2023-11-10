@@ -226,3 +226,33 @@ body {
   font-size: 50px;
   color: red;
 }
+
+.success {
+  color: green;
+}
+
+.warning {
+  color: yellow;
+}
+
+.error {
+  color: red;
+}
+
+.flashed-messages {
+  animation: disappear 5s forwards;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes disappear {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.logout-btn {
+  margin-top: 10px;
+}

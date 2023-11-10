@@ -1,0 +1,16 @@
+{% extends "base.jinja" %}
+{% block title %}
+  Account
+{% endblock title %}
+{% block content %}
+  <div class="app-container">
+    <div>
+      <div class="welcome-wrapper">
+        <div>Hello, {{ current_user.userName }}!</div>
+        <form method="post">
+          {{ form.logout(class="btn logout-btn") }}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

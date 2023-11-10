@@ -1,22 +1,24 @@
 from flask import request, render_template, redirect, url_for, flash
 import requests, random
 from app import app
-from app.forms import PokedexInputForm, LoginForm, SignupForm
-from app.users import REGISTERED_USERS
+from app.forms import PokedexInputForm, LoginForm, SignupForm, AccountForm
+from app.models import User, db
+from flask_login import logout_user, current_user
 
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
     if request.method == "POST":
         return redirect(url_for("pokedex"))
-    else:
-        return render_template('landingPage.jinja')
+    
+    return render_template('landingPage.jinja')
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
 
     if request.method == "POST":
-        if "loginBtn" in request.form and form.validate_on_submit() and form.validatePassword():
+        if "loginBtn" in request.form and form.validate_on_submit() and form.attemptLogin():
+            flash("Successfully logged in!", "success")
             return redirect (url_for("landingPage"))
         elif "signupBtn" in request.form:
             return redirect(url_for("signup"))
@@ -28,11 +30,29 @@ def signup():
     form = SignupForm()
 
     if request.method == "POST" and form.validate_on_submit():
-        REGISTERED_USERS[form.userName.data] = form.password.data
-        flash("Account created!")
+        userName = form.userName.data
+        password = form.password.data
+
+        user = User(userName, password)
+        print(user)
+
+        db.session.add(user)
+        db.session.commit()
+        
+        flash("Account created!", "success")
         return redirect(url_for('login'))
-    else:
-        return render_template('signup.jinja', form=form)
+    
+    return render_template('signup.jinja', form=form)
+
+@app.route("/account", methods=['GET', 'POST'])
+def account():
+    form = AccountForm()
+    if request.method == "POST":
+        logout_user()
+        flash("Logged out...", "warning")
+        return redirect(url_for('login'))
+
+    return render_template('account.jinja', form=form)
 
 
 @app.route("/pokedex", methods=['GET', 'POST'])
@@ -137,5 +157,5 @@ def pokedex():
 
         return render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
         
-    else:
-        return render_pokedex()
+    
+    return render_pokedex()

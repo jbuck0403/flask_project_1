@@ -16,20 +16,26 @@
       <li>
         <a href='{{ url_for("landingPage") }}'>Home</a>
       </li>
-      <li>
-        <a href='{{ url_for("login") }}'>Log In</a>
-      </li>
-      <li>
-        <a href='{{ url_for("signup") }}'">Create Account</a>
-      </li>
+      {% if not current_user.is_authenticated %}
+        <li>
+          <a href='{{ url_for("login") }}'>Log In</a>
+        </li>
+        <li>
+          <a href='{{ url_for("signup") }}'">Create Account</a>
+        </li>
+      {% else %}
+        <li>
+          <a href='{{ url_for("account") }}'">{{ current_user.userName }}</a>
+        </li>
+      {% endif %}
       <li>
         <a href='{{ url_for("pokedex") }}'>Pokedex</a>
       </li>
     </ul>
   </nav>
-  {% with messages = get_flashed_messages() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+      {% for category, message in messages %}<div class="flashed-messages {{ category }}">{{ message }}</div>{% endfor %}
     {% endif %}
   {% endwith %}
   {% block content %}

@@ -1,1 +1,0 @@
-REGISTERED_USERS = {'me': '123'}
