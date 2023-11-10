@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect
+from flask import request, render_template, redirect, url_for, flash
 import requests, random
 from app import app
 from app.forms import PokedexInputForm, LoginForm, SignupForm
@@ -7,7 +7,7 @@ from app.users import REGISTERED_USERS
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
     if request.method == "POST":
-        return redirect("/pokedex")
+        return redirect(url_for("pokedex"))
     else:
         return render_template('landingPage.jinja')
 
@@ -17,9 +17,9 @@ def login():
 
     if request.method == "POST":
         if "loginBtn" in request.form and form.validate_on_submit() and form.validatePassword():
-            return redirect ("/")
+            return redirect (url_for("landingPage"))
         elif "signupBtn" in request.form:
-            return redirect("/signup")
+            return redirect(url_for("signup"))
         
     return render_template('login.jinja', form=form)
 
@@ -29,7 +29,8 @@ def signup():
 
     if request.method == "POST" and form.validate_on_submit():
         REGISTERED_USERS[form.userName.data] = form.password.data
-        return redirect('/login')
+        flash("Account created!")
+        return redirect(url_for('login'))
     else:
         return render_template('signup.jinja', form=form)
 

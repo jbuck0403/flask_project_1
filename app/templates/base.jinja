@@ -14,19 +14,24 @@
   <nav>
     <ul class="nav-bar">
       <li>
-        <a href="/">Home</a>
+        <a href='{{ url_for("landingPage") }}'>Home</a>
       </li>
       <li>
-        <a href="/login">Log In</a>
+        <a href='{{ url_for("login") }}'>Log In</a>
       </li>
       <li>
-        <a href="/signup">Create Account</a>
+        <a href='{{ url_for("signup") }}'">Create Account</a>
       </li>
       <li>
-        <a href="/pokedex">Pokedex</a>
+        <a href='{{ url_for("pokedex") }}'>Pokedex</a>
       </li>
     </ul>
   </nav>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+    {% endif %}
+  {% endwith %}
   {% block content %}
   {% endblock content %}
 </body>
