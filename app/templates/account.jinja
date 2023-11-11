@@ -7,9 +7,15 @@
     <div>
       <div class="welcome-wrapper">
         <div>Hello, {{ current_user.userName }}!</div>
-        <form method="post">
-          {{ form.logout(class="btn logout-btn") }}
-        </form>
+        <div class="input-form-wrapper">
+          <form method="post">
+            {{ form.changeUserName.label }}
+            {{ form.changeUserName }}
+          </form>
+          <form method="post">
+            {{ form.logoutBtn(class="btn logout-btn") }}
+          </form>
+        </div>
       </div>
     </div>
   </div>

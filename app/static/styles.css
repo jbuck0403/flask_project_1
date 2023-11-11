@@ -1,6 +1,7 @@
 :root {
   box-sizing: border-box;
   --primary-link-color: rgba(255, 0, 0, 0.236);
+  --primary-btn-color: rgba(255, 0, 0, 0.525);
 }
 
 @font-face {
@@ -90,9 +91,10 @@ body {
   flex-direction: column;
   text-align: center;
   align-items: center;
+  height: 100%;
 }
 
-.input-container input {
+/* .input-container input {
   border-radius: 8px;
   width: 400px;
   height: 40px;
@@ -103,10 +105,14 @@ body {
   background-color: rgb(60, 59, 59);
   color: white;
   border: none;
-}
+} */
 
 .input-container input:focus {
   outline: none;
+}
+
+.label-field-container {
+  display: flex;
 }
 
 .error {
@@ -149,7 +155,24 @@ body {
   color: var(--primary-link-color);
 }
 
+/* .input-container input {
+  border-radius: 8px;
+  width: 400px;
+  height: 40px;
+  padding-left: 20px;
+  margin-top: 10px;
+  font-size: 30px;
+  text-align: center;
+  background-color: rgb(60, 59, 59);
+  color: white;
+  border: none;
+} */
+
 .field {
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  border: none;
   margin-left: 20px;
   margin-top: 20px;
   height: 40px;
@@ -157,29 +180,56 @@ body {
   font-size: 40px;
   font-family: "orange-kid";
   padding-left: 20px;
+  background-color: rgb(60, 59, 59);
 }
 
-.login {
+.pokedex-field {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
+  margin-left: 0;
+  padding: 0;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.pokedex-wrapper {
   display: flex;
   flex-direction: column;
-}
-
-.login-wrapper {
-  display: flex;
+  text-align: center;
   align-items: center;
 }
 
-.login-field-container {
+.input-label {
   display: flex;
   flex-direction: column;
 }
 
-.login-wrapper label {
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  text-align: right;
+  margin-bottom: 40px;
+}
+
+.input-field-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.pokedex-input-field-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-wrapper label {
   height: 65px;
   text-align: right;
 }
 
-.login-container {
+.input-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -190,7 +240,7 @@ body {
   height: 60px;
   width: 250px;
   border-radius: 10px;
-  background-color: rgb(249, 46, 46);
+  background-color: var(--primary-btn-color);
   color: white;
   font-size: 40px;
   font-family: "orange-kid";
@@ -209,16 +259,12 @@ body {
   background-color: white;
 }
 
-.login-form {
+.input-form {
   height: 180px;
 }
 
 .btn:active {
   transform: translate(3px, 3px);
-}
-
-.sign-in-btn {
-  margin-top: 30px;
 }
 
 .form-error {

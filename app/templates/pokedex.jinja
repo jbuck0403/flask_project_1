@@ -13,9 +13,9 @@
       <div class="content-wrapper">
         <form method="post">
           {{ form.hidden_tag() }}
-          <div class="input-container">
+          <div class="pokedex-wrapper">
             {{ form.pokedexInput.label(for="pokemonID") }}
-            {{ form.pokedexInput(id="pokemonID") }}
+            <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
           </div>
         </form>
         {% if connectErrorCode %}{{ connectErrorCode }}{% endif %}

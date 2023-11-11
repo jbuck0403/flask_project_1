@@ -3,7 +3,8 @@ import requests, random
 from app import app
 from app.forms import PokedexInputForm, LoginForm, SignupForm, AccountForm
 from app.models import User, db
-from flask_login import logout_user, current_user
+from flask_login import logout_user, current_user, login_required
+
 
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
@@ -45,12 +46,14 @@ def signup():
     return render_template('signup.jinja', form=form)
 
 @app.route("/account", methods=['GET', 'POST'])
+@login_required
 def account():
     form = AccountForm()
     if request.method == "POST":
-        logout_user()
-        flash("Logged out...", "warning")
-        return redirect(url_for('login'))
+        if "logoutBtn" in request.form:
+            logout_user()
+            flash("Logged out...", "warning")
+            return redirect(url_for('login'))
 
     return render_template('account.jinja', form=form)
 

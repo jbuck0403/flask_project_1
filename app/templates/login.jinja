@@ -3,7 +3,7 @@
   Sign In
 {% endblock title %}
 {% block content %}
-  <div class="login-container">
+  <div class="input-container">
     <div>
       <div class="form-error">
         {% if form.userName.errors %}
@@ -12,22 +12,22 @@
           {% for error in form.password.errors %}{{ error }}{% endfor %}
         {% endif %}
       </div>
-      <form method="post" class="login-form">
+      <form method="post" class="input-form">
         {{ form.hidden_tag() }}
-        <div class="login-wrapper">
-          <div class="login">
+        <div class="input-wrapper">
+          <div class="input-label">
             {{ form.userName.label }}
             {{ form.password.label }}
           </div>
-          <div class="login-field-container">
-            {{ form.userName(class="field") }}
-            {{ form.password(class="field") }}
+          <div class="input-field-container">
+            {{ form.userName(class_="field") }}
+            {{ form.password(class_="field") }}
           </div>
         </div>
-        <div class="btn-wrapper">{{ form.loginBtn(class="btn sign-in-btn") }}</div>
+        <div class="btn-wrapper">{{ form.loginBtn(class_="btn") }}</div>
       </form>
       <form method="post">
-        <div class="btn-wrapper">{{ form.signupBtn(class="btn create-account-btn") }}</div>
+        <div class="btn-wrapper">{{ form.signupBtn(class_="btn") }}</div>
       </form>
     </div>
   </div>
