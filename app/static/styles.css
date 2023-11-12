@@ -315,3 +315,18 @@ form {
   background-color: var(--primary-btn-color);
   color: white;
 }
+
+.favorite-container {
+  text-align: center;
+}
+
+.favorite-btn-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.display-favorite {
+  position: absolute;
+  top: 0%;
+  right: 0%;
+}

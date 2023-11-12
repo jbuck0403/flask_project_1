@@ -10,7 +10,7 @@ class User(db.Model, UserMixin):
     userName = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     dateCreated = db.Column(db.Date, nullable=False, default=datetime.utcnow())
-    # favoritePkmn = db.Column(db.Integer, default = 201)
+    favoritePkmn = db.Column(db.String(10), nullable=False, default = "201,d")
 
     def __init__(self, userName, password):
         self.userName = userName

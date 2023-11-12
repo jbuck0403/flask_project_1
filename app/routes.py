@@ -6,13 +6,24 @@ from app.models import User, db
 from flask_login import logout_user, current_user, login_required
 from app.Pokedex import Pokedex
 
+@app.context_processor
+def injectFavoriteSprite():
+    if current_user.is_authenticated:
+        pokedex = Pokedex()
+        favoritePkmn = current_user.favoritePkmn.split(',')
+        pkmnID, spriteType = favoritePkmn[0], False if favoritePkmn[1] == 'd' else True
+
+        favoriteSprite = pokedex.returnSpriteURL(pkmn=pkmnID, pkmnType='pokemon', shiny=spriteType)
+    else:
+        favoriteSprite = None
+    return dict(favoriteSprite=favoriteSprite)
+
 @app.route("/", methods=['GET', 'POST'])
 def landingPage():
     pokedex = Pokedex()
-    
+
     return render_template('landingPage.jinja', unownWord=pokedex.unownSpeller("welcome"))
     
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -67,6 +78,9 @@ def account():
 
     if request.method == "POST":
         if "logoutBtn" in request.form:
+            return render_account(form=form, requestConfirmLogout=True)
+        
+        if "confirmLogoutBtn" in request.form:
             logout_user()
             flash("Logged out...", "warning")
             return redirect(url_for('login'))
@@ -134,7 +148,34 @@ def pokedex():
         if  spriteShinyURL == None or not shinySpriteResponse.ok:
             return pokedex.render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
 
+        print(spriteURL)
         return pokedex.render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
         
     
     return pokedex.render_pokedex()
+
+@app.route("/favorite", methods=['GET', 'POST'])
+@login_required
+def favorite():
+    form = PokedexInputForm()
+    pokedex = Pokedex(form)
+
+    if request.method == "POST":
+        if "favoritePkmn" in request.form or "favoriteShinyPkmn" in request.form:
+            #current_user.favoritePkmn = f"{}"
+            print("yes")
+        elif "pokedexInput" in request.form and form.validate_on_submit():
+            pokemonData = pokedex.returnPokemonData(form, favorite=True)
+            if not isinstance(pokemonData, int):
+                name, pokedexID, sprite, shinySprite = pokemonData
+            else:
+                sprite = pokemonData
+            form.pokedexInput.data = ""
+            if isinstance(sprite, int):
+                unownWord = pokedex.unownSpeller()
+                if isinstance(unownWord[0], int):
+                    return render_template("favorite.jinja", form=form, errorCode=unownWord[0])
+                return render_template("favorite.jinja", form=form, unownWord=unownWord)
+            return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
+
+    return render_template("favorite.jinja", form=form)

@@ -22,6 +22,9 @@ class Pokedex():
         return [self.returnSpriteURL(pkmn=index, pkmnType="pokemon-form") for index in unownIndexes]
         
     def returnSpriteURL(self, pkmn=10027, pkmnType="pokemon-form", shiny=False):
+        """returns a pokemon sprite from id or name (accepts string or int)
+        
+        default returns a pokemon-form, pkmnType='pokemon' to return a regular pokemon"""
         url = f"https://pokeapi.co/api/v2/{pkmnType}/{pkmn}"
         response = requests.get(url)
 
@@ -31,7 +34,8 @@ class Pokedex():
             data = response.json()
             return data["sprites"][f"front_{'shiny' if shiny else 'default'}"]
 
-    def renderSprite(self, errorCode, unownWord=False):
+    def renderSprite(self, errorCode, unownWord=False, *args):
+    
         sprite = self.returnSpriteURL()
 
         if len(sprite) == 3:
@@ -43,7 +47,7 @@ class Pokedex():
             else:
                 return self.render_pokedex(errorCode=errorCode, sprite=sprite)
 
-    def returnPokemonData(self, form):
+    def returnPokemonData(self, form, favorite=False):
         id = form.pokedexInput.data.strip()
         print(id)
 
@@ -52,11 +56,17 @@ class Pokedex():
 
         if not response.ok or id.isspace():
             return response.status_code
-            
         
         data = response.json()
 
+        spriteURL = data['sprites']['front_default']
+        spriteShinyURL = data['sprites']['front_shiny']
+        pokedexID = data['id']
         name = data['name'].title()
+
+        if favorite:
+            return name, pokedexID, spriteURL, spriteShinyURL
+        
         abilities = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == False]
         try:
             hiddenAbility = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == True][0]
@@ -64,11 +74,8 @@ class Pokedex():
             hiddenAbility = 'None'
 
         baseExp = data['base_experience']
-        spriteURL = data['sprites']['front_default']
-        spriteShinyURL = data['sprites']['front_shiny']
         baseStats = {stat['stat']['name'].upper() + ':': stat['base_stat'] for stat in data['stats']}
         pokemonType = [pkmnType['type']['name'].title() for pkmnType in data['types']]
-        pokedexID = data['id']
 
         pokemonType = f"{pokemonType[0]}{'/' + pokemonType[1] if len(pokemonType) > 1 else ''}"
 

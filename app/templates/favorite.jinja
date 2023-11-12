@@ -1,0 +1,49 @@
+{% extends "base.jinja" %}
+{% block title %}
+  Pokedex
+{% endblock title %}
+{% block content %}
+  <div class="app-container">
+    <div>
+      <div class="form-error">
+        {% if form.pokedexInput.errors %}
+          {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
+        {% endif %}
+      </div>
+      <div class="content-wrapper">
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="pokedex-wrapper">
+            {{ form.pokedexInput.label(for="pokemonID") }}
+            <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
+          </div>
+        </form>
+        {% if connectErrorCode %}
+          {{ connectErrorCode }}
+        {% elif unownWord %}
+          <div class="error">
+            <div>
+              {% for sprite in unownWord %}<img src="{{ sprite }}" alt="" height="" width="" class="sprite">{% endfor %}
+            </div>
+            <div>Couldn't find that one...</div>
+          </div>
+        {% elif spriteURL %}
+          <div class="favorite-container">
+            <div>{{ name }}</div>
+            <div>
+              <img src="{{ spriteURL }}" alt="" height="" width="" class="sprite">
+              <img src="{{ shinySpriteURL }}" alt="" height="" width="" class="sprite">
+            </div>
+            <div class="favorite-btn-container"></div>
+            <form method="post">
+              {{ form.favoritePkmn(class="btn") }}
+            </form>
+            <form method="post">
+              {{ form.favoriteShinyPkmn(class="btn") }}
+            </form>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

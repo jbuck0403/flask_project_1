@@ -40,6 +40,8 @@ def verifyPassword(_, currentPassword):
 
 class PokedexInputForm(FlaskForm):
     pokedexInput = StringField('Enter Pokémon', validators=[notEmpty, verifyAllowedInput])
+    favoritePkmn = SubmitField('Choose Normal')
+    favoriteShinyPkmn = SubmitField('Choose Shiny')
 
 class LoginForm(FlaskForm):
     userName = StringField("User Name", validators=[notEmpty])
@@ -73,6 +75,7 @@ class AccountForm(FlaskForm):
     changePasswordBtn = SubmitField("Change Password")
     changeUserNameBtn = SubmitField("Change Name")
     deleteAccountBtn = SubmitField("Delete Account")
+    confirmLogoutBtn = SubmitField("Confirm Logout")
 
 class UpdateAccountUserNameForm(AccountForm):
     changeUserName = StringField("New User Name", validators=[notEmpty, verifyUserNameRequirements])

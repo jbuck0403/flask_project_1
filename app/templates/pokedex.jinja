@@ -23,15 +23,17 @@
           <div class="error">
             {% if unownWord %}
               <div>
-                {% for sprite in unownWord %}<img src="{{ sprite }}" alt="" height="" width="" class="sprite">{% endfor %}
+                {% for sprite in unownWord %}
+                  <img src="{{ sprite }}"
+                       alt=""
+                       height=""
+                       width=""
+                       class="sprite"
+                       loading="">
+                {% endfor %}
               </div>
             {% else %}
-              <img src="{{ sprite }}"
-                   alt=""
-                   height=""
-                   width=""
-                   class="sprite"
-                   loading="lazy">
+              <img src="{{ sprite }}" alt="" height="" width="" class="sprite">
               <div>Oops...</div>
             {% endif %}
             <div>Couldn't find that one...</div>

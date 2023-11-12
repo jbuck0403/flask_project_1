@@ -31,7 +31,17 @@
         {% endif %}
       </div>
       <div class="welcome-wrapper">
-        <div>Hello, {{ current_user.userName }}!</div>
+        {% if requestConfirmLogout %}
+          <div>Are you sure?</div>
+        {% elif requestUserNameChange %}
+          <div>Tired of {{ current_user.userName }}?</div>
+        {% elif requestPasswordChange %}
+          <div>This one too long?</div>
+        {% elif requestDeleteAccount %}
+          <div>This cannot be undone</div>
+        {% else %}
+          <div>Hello, {{ current_user.userName }}!</div>
+        {% endif %}
         <div class="input-form-wrapper">
           {% if requestUserNameChange %}
             <form method="post">
@@ -91,18 +101,23 @@
             <form method="post">
               {{ form.cancelBtn(class_="btn") }}
             </form>
+          {% elif requestConfirmLogout %}
+            <form method="post">
+              <div class="input-form-wrapper">
+                {{ form.confirmLogoutBtn(class_="btn top-btn") }}
+                {{ form.cancelBtn(class_="btn") }}
+              </div>
+            </form>
           {% else %}
             <form method="post">
               <div class="input-form-wrapper">
                 {{ form.changeUserNameBtn(class_="btn top-btn") }}
                 {{ form.changePasswordBtn(class_="btn") }}
                 {{ form.deleteAccountBtn(class_="btn delete-account-btn") }}
+                {{ form.logoutBtn(class_="btn logout-btn") }}
               </div>
             </form>
           {% endif %}
-          <form method="post">
-            <div class="input-form-wrapper">{{ form.logoutBtn(class_="btn logout-btn") }}</div>
-          </form>
         </div>
       </div>
     </div>
