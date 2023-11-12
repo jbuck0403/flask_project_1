@@ -1,4 +1,4 @@
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, redirect, url_for, flash, session
 import requests, random
 from app import app
 from app.forms import PokedexInputForm, LoginForm, SignupForm, AccountForm, UpdateAccountUserNameForm, UpdateAccountPasswordForm, DeleteAccountForm
@@ -161,9 +161,17 @@ def favorite():
     pokedex = Pokedex(form)
 
     if request.method == "POST":
+        print(request.form)
         if "favoritePkmn" in request.form or "favoriteShinyPkmn" in request.form:
             #current_user.favoritePkmn = f"{}"
-            print("yes")
+            pokedexID = session.get('pokedexID', current_user.userName)
+            if "favoritePkmn" in request.form:
+                sprite = session.get('sprite', current_user.userName)
+            else:
+                sprite = session.get('shinySprite', current_user.userName)
+
+            print("$$$$$$$$$$$$$$", pokedexID, sprite)
+
         elif "pokedexInput" in request.form and form.validate_on_submit():
             pokemonData = pokedex.returnPokemonData(form, favorite=True)
             if not isinstance(pokemonData, int):
@@ -176,6 +184,9 @@ def favorite():
                 if isinstance(unownWord[0], int):
                     return render_template("favorite.jinja", form=form, errorCode=unownWord[0])
                 return render_template("favorite.jinja", form=form, unownWord=unownWord)
+            session['pokedexID'] = pokedexID
+            session['shinySprite'] = shinySprite
+            session['sprite'] = sprite
             return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
 
     return render_template("favorite.jinja", form=form)
