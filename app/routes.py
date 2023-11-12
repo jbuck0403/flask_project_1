@@ -1,7 +1,7 @@
 from flask import request, render_template, redirect, url_for, flash
 import requests, random
 from app import app
-from app.forms import PokedexInputForm, LoginForm, SignupForm, AccountForm, UpdateAccountUserNameForm, UpdateAccountPasswordForm
+from app.forms import PokedexInputForm, LoginForm, SignupForm, AccountForm, UpdateAccountUserNameForm, UpdateAccountPasswordForm, DeleteAccountForm
 from app.models import User, db
 from flask_login import logout_user, current_user, login_required
 from app.Pokedex import Pokedex
@@ -57,35 +57,57 @@ def signup():
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
+    def render_account(**kwargs):
+        return render_template('account.jinja', **kwargs)
+
     form = AccountForm()
     userNameForm = UpdateAccountUserNameForm()
     passwordForm = UpdateAccountPasswordForm()
+    deleteAccountForm = DeleteAccountForm()
 
     if request.method == "POST":
         if "logoutBtn" in request.form:
             logout_user()
             flash("Logged out...", "warning")
             return redirect(url_for('login'))
+        
+        elif "cancel" in request.form:
+            return render_account(form=form)
+        
         elif "changeUserName" in request.form:
             if userNameForm.validate_on_submit():
-                userNameForm.updateUserName()
+                if not userNameForm.updateUserName():
+                    flash("Error updating User Name...", "error")
             else:
                 userNameForm.changeUserName.data = ""
-                return render_template('account.jinja', form=userNameForm, requestUserNameChange=True)
+                return render_account(form=userNameForm, requestUserNameChange=True)
+            
         elif "changeUserNameBtn" in request.form:
-            return render_template('account.jinja', form=userNameForm, requestUserNameChange=True)
-        elif "cancel" in request.form:
-            return render_template('account.jinja', form=form)
+            return render_account(form=userNameForm, requestUserNameChange=True)
+        
         elif "currentPassword" in request.form:
-            if passwordForm.validate_on_submit():    
-                passwordForm.updatePassword()
-                return render_template('account.jinja', form=form)
+            if passwordForm.validate_on_submit():
+                if not passwordForm.updatePassword():
+                    flash("Error updating password...", "error")
             else:
-                return render_template('account.jinja', form=passwordForm, requestPasswordChange=True)
+                return render_account(form=passwordForm, requestPasswordChange=True)
+            
         elif "changePasswordBtn" in request.form:
-            return render_template('account.jinja', form=passwordForm, requestPasswordChange=True)
+            return render_account(form=passwordForm, requestPasswordChange=True)
+        
+        elif "verifyIntentionToDelete" in request.form:
+            if deleteAccountForm.validate_on_submit():
+                if not deleteAccountForm.deleteAccount():
+                    flash("Error deleting account...", "error")
+                else:
+                    return redirect(url_for("landingPage"))
+            else:
+                return render_account(form=deleteAccountForm, requestDeleteAccount=True)
 
-    return render_template('account.jinja', form=form)
+        elif "deleteAccountBtn" in request.form:
+            return render_account(form=deleteAccountForm, requestDeleteAccount=True)
+    
+    return render_account(form=form)
 
 
 @app.route("/pokedex", methods=['GET', 'POST'])

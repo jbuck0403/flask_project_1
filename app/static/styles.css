@@ -304,3 +304,14 @@ form {
 .top-btn {
   margin-top: 20px;
 }
+
+.delete-account-btn {
+  position: absolute;
+  bottom: 1%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.delete-account-btn:hover {
+  background-color: var(--primary-btn-color);
+  color: white;
+}

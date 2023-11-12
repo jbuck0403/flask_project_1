@@ -6,6 +6,8 @@ from app.models import User, db
 from flask_login import login_user, current_user
 import re
 
+DELETE_ACCOUNT_KEYWORD = "DELETE"
+
 def verifyAllowedInput(_, userInput):
     pattern = re.compile(r'^[\-a-zA-Z0-9]*$')
     if not pattern.match(userInput.data):
@@ -27,8 +29,7 @@ def verifyUserNameRequirements(_, userName):
     verifyUniqueUserName(_, userName)    
 
 def notEmpty(_, userInput):
-    if userInput.data == None or len(userInput.data.strip()) == 0:
-        
+    if userInput.data == None or len(userInput.data.strip()) == 0: 
         raise ValidationError(f"{str(userInput.label)} cannot be blank...")
 
 def verifyPassword(_, currentPassword):
@@ -71,6 +72,7 @@ class AccountForm(FlaskForm):
     cancelBtn = SubmitField("Cancel")
     changePasswordBtn = SubmitField("Change Password")
     changeUserNameBtn = SubmitField("Change Name")
+    deleteAccountBtn = SubmitField("Delete Account")
 
 class UpdateAccountUserNameForm(AccountForm):
     changeUserName = StringField("New User Name", validators=[notEmpty, verifyUserNameRequirements])
@@ -98,3 +100,39 @@ class UpdateAccountPasswordForm(AccountForm):
         except:
             db.session.rollback()
             return False
+        
+def confirmDeleteAccount(_, userInput):
+    if userInput.data != DELETE_ACCOUNT_KEYWORD:
+        raise ValidationError("Enter the exact word...")
+    
+def confirmAccountExists(_, userInput):
+    queriedUser = User.query.filter(User.userName == userInput.data).first()
+
+    if not queriedUser:
+        raise ValidationError("Invalid User Name...")
+    
+def confirmUserLoggedIn(_, userInput):
+    if not current_user.userName == userInput.data:
+        raise ValidationError("Cannot delete account that isn't logged in...")
+
+class DeleteAccountForm(AccountForm):
+    verifyIntentionToDelete = StringField(f"Type '{DELETE_ACCOUNT_KEYWORD}'", validators=[confirmDeleteAccount])
+    userName = StringField("User Name", validators=[notEmpty, confirmAccountExists, confirmUserLoggedIn])
+    password = PasswordField("Password", validators=[notEmpty, verifyPassword])
+
+    def deleteAccount(self):
+        queriedUser = User.query.filter(User.userName == self.userName.data).first()
+        print(queriedUser)
+        
+        if current_user.userName == queriedUser.userName:
+            try:
+                user = db.session.query(User).get(current_user.id)
+                db.session.delete(user)
+                db.session.commit()
+                return True
+            except:
+                db.session.rollback()
+                return False
+
+
+        

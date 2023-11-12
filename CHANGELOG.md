@@ -13,3 +13,5 @@ CHANGELOG 2
 - change password functionality
 
 CHANGELOG 3
+
+- delete account functionality
