@@ -19,3 +19,5 @@ CHANGELOG 3
 CHANGELOG 4
 
 - added ability to pick an account favorite pokemon that displays in the top right
+- added "Are you sure?" button after logout button
+- cleaned up account management ui/ux
