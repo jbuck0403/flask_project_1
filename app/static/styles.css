@@ -2,6 +2,8 @@
   box-sizing: border-box;
   --primary-link-color: rgba(255, 0, 0, 0.236);
   --primary-btn-color: rgba(255, 0, 0, 0.525);
+  margin: 0;
+  padding: 0;
 }
 
 @font-face {
@@ -16,6 +18,10 @@ body {
   background-color: rgb(28, 27, 27);
   color: white;
   font-size: 60px;
+}
+
+form {
+  margin: 0;
 }
 
 .nav-bar {
@@ -159,22 +165,8 @@ body {
   color: var(--primary-link-color);
 }
 
-/* .input-container input {
-  border-radius: 8px;
-  width: 400px;
-  height: 40px;
-  padding-left: 20px;
-  margin-top: 10px;
-  font-size: 30px;
-  text-align: center;
-  background-color: rgb(60, 59, 59);
-  color: white;
-  border: none;
-} */
-
 .field {
   border-radius: 8px;
-  text-align: center;
   color: white;
   border: none;
   margin-left: 20px;
@@ -189,7 +181,7 @@ body {
 
 .pokedex-field {
   display: flex;
-  align-items: center;
+  text-align: center;
   justify-content: center;
   width: 400px;
   margin-left: 0;
@@ -247,6 +239,7 @@ body {
   color: white;
   font-size: 40px;
   font-family: "orange-kid";
+  margin-top: 10px;
 }
 
 .btn-wrapper {
@@ -263,7 +256,7 @@ body {
 }
 
 .input-form {
-  height: 180px;
+  min-height: 180px;
 }
 
 .btn:active {
@@ -302,6 +295,12 @@ body {
   }
 }
 
-.logout-btn {
-  margin-top: 10px;
+.input-form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.top-btn {
+  margin-top: 20px;
 }

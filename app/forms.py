@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, EqualTo, ValidationError
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from app.models import User, db
 from flask_login import login_user, current_user
 import re
@@ -31,6 +31,11 @@ def notEmpty(_, userInput):
         
         raise ValidationError(f"{str(userInput.label)} cannot be blank...")
 
+def verifyPassword(_, currentPassword):
+    currentUserPassword = User.query.filter(User.userName == current_user.userName).first().password
+    
+    if not check_password_hash(currentUserPassword, currentPassword.data):
+        raise ValidationError('Invalid password...')
 
 class PokedexInputForm(FlaskForm):
     pokedexInput = StringField('Enter Pokémon', validators=[notEmpty, verifyAllowedInput])
@@ -63,7 +68,33 @@ class SignupForm(FlaskForm):
 
 class AccountForm(FlaskForm):
     logoutBtn = SubmitField("Logout")
-    changeUserName = StringField("Change User Name", validators=[notEmpty, verifyUserNameRequirements])
+    cancelBtn = SubmitField("Cancel")
+    changePasswordBtn = SubmitField("Change Password")
+    changeUserNameBtn = SubmitField("Change Name")
+
+class UpdateAccountUserNameForm(AccountForm):
+    changeUserName = StringField("New User Name", validators=[notEmpty, verifyUserNameRequirements])
+    password = PasswordField("Password", validators=[notEmpty, verifyPassword])
 
     def updateUserName(self):
-        return
+        try:
+            current_user.userName = self.changeUserName.data
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
+        
+class UpdateAccountPasswordForm(AccountForm):
+    newPassword = PasswordField("New Password", validators=[verifyPasswordRequirements])
+    confirmNewPassword = PasswordField("Confirm New Password", validators=[EqualTo('newPassword', message="Passwords must match...")])
+    currentPassword = PasswordField("Current Password", validators=[notEmpty, verifyPassword])
+
+    def updatePassword(self):
+        try:
+            current_user.password = generate_password_hash(self.newPassword.data)
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False

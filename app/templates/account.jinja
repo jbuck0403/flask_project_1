@@ -5,15 +5,74 @@
 {% block content %}
   <div class="app-container">
     <div>
+      <div class="form-error">
+        {% if form.changeUserName %}
+          {% if form.changeUserName.errors %}
+            {% for error in form.changeUserName.errors %}{{ error }}{% endfor %}
+          {% elif form.password.errors %}
+            {% for error in form.password.errors %}{{ error }}{% endfor %}
+          {% endif %}
+        {% elif form.currentPassword %}
+          {% if form.currentPassword.errors %}
+            {% for error in form.currentPassword.errors %}{{ error }}{% endfor %}
+          {% elif form.newPassword.errors %}
+            {% for error in form.newPassword.errors %}{{ error }}{% endfor %}
+          {% elif form.confirmNewPassword.errors %}
+            {% for error in form.confirmNewPassword.errors %}{{ error }}{% endfor %}
+          {% endif %}
+        {% endif %}
+      </div>
       <div class="welcome-wrapper">
         <div>Hello, {{ current_user.userName }}!</div>
         <div class="input-form-wrapper">
+          {% if requestUserNameChange %}
+            <form method="post">
+              {{ form.hidden_tag() }}
+              <div class="input-wrapper">
+                <div class="input-label">
+                  {{ form.changeUserName.label }}
+                  {{ form.password.label }}
+                </div>
+                <div class="input-field-container">
+                  {{ form.changeUserName(class_="field") }}
+                  {{ form.password(class_="field") }}
+                </div>
+              </div>
+              <div class="input-form-wrapper">{{ form.changeUserNameBtn(class_="btn top-btn") }}</div>
+            </form>
+            <form method="post">
+              {{ form.cancelBtn(class_="btn top") }}
+            </form>
+          {% elif requestPasswordChange %}
+            <form method="post">
+              {{ form.hidden_tag() }}
+              <div class="input-wrapper">
+                <div class="input-label">
+                  {{ form.currentPassword.label }}
+                  {{ form.newPassword.label }}
+                  {{ form.confirmNewPassword.label }}
+                </div>
+                <div class="input-field-container">
+                  {{ form.currentPassword(class_="field") }}
+                  {{ form.newPassword(class_="field") }}
+                  {{ form.confirmNewPassword(class_="field") }}
+                </div>
+              </div>
+              <div class="input-form-wrapper">{{ form.changePasswordBtn(class_="btn top-btn") }}</div>
+            </form>
+            <form method="post">
+              {{ form.cancelBtn(class_="btn") }}
+            </form>
+          {% else %}
+            <form method="post">
+              <div class="input-form-wrapper">
+                {{ form.changeUserNameBtn(class_="btn top-btn") }}
+                {{ form.changePasswordBtn(class_="btn") }}
+              </div>
+            </form>
+          {% endif %}
           <form method="post">
-            {{ form.changeUserName.label }}
-            {{ form.changeUserName }}
-          </form>
-          <form method="post">
-            {{ form.logoutBtn(class="btn logout-btn") }}
+            {{ form.logoutBtn(class_="btn logout-btn") }}
           </form>
         </div>
       </div>

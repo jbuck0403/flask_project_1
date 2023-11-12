@@ -13,7 +13,7 @@ class Pokedex():
         errorMessages = ['oops', 'sorry', '?', 'huh', 'nani', 'what', 'wtf']
         if wordToSpell == True:
            wordToSpell = errorMessages[random.randint(0,len(errorMessages) - 1)]
-        
+
         if wordToSpell == '?':
             unownIndexes = [10027]
         else:
