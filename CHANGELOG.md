@@ -15,3 +15,5 @@ CHANGELOG 2
 CHANGELOG 3
 
 - delete account functionality
+
+CHANGELOG 4
