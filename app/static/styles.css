@@ -145,6 +145,10 @@ body {
   align-items: center;
 }
 
+.unown-word {
+  display: flex;
+}
+
 .data-link {
   text-decoration: none;
   color: white;
@@ -190,7 +194,6 @@ body {
   width: 400px;
   margin-left: 0;
   padding: 0;
-  text-transform: uppercase;
   outline: none;
 }
 

@@ -26,7 +26,12 @@
                 {% for sprite in unownWord %}<img src="{{ sprite }}" alt="" height="" width="" class="sprite">{% endfor %}
               </div>
             {% else %}
-              <img src="{{ sprite }}" alt="" height="" width="" class="sprite">
+              <img src="{{ sprite }}"
+                   alt=""
+                   height=""
+                   width=""
+                   class="sprite"
+                   loading="lazy">
               <div>Oops...</div>
             {% endif %}
             <div>Couldn't find that one...</div>
@@ -43,15 +48,8 @@
             <table class="pokemon-data">
               {% for dataLabel, data in pokemonInfoDict %}
                 <tr>
-                  {% if dataLabel == 'Name:' %}
-                    <td class="data-label">{{ dataLabel }}</td>
-                    <td>
-                      <a href="{{ bulbaURL }}" target="_blank" class="data data-link">{{ data }}</a>
-                    </td>
-                  {% else %}
-                    <td class="data-label">{{ dataLabel }}</td>
-                    <td class="data">{{ data }}</td>
-                  {% endif %}
+                  <td class="data-label">{{ dataLabel }}</td>
+                  <td class="data">{{ data }}</td>
                 </tr>
               {% endfor %}
             </table>
