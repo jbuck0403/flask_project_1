@@ -17,3 +17,5 @@ CHANGELOG 3
 - delete account functionality
 
 CHANGELOG 4
+
+- added ability to pick an account favorite pokemon that displays in the top right

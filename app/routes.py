@@ -8,7 +8,7 @@ from app.Pokedex import Pokedex
 
 @app.context_processor
 def injectFavoriteSprite():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.favoritePkmn != None:
         pokedex = Pokedex()
         favoritePkmn = current_user.favoritePkmn.split(',')
         pkmnID, spriteType = favoritePkmn[0], False if favoritePkmn[1] == 'd' else True
@@ -163,14 +163,18 @@ def favorite():
     if request.method == "POST":
         print(request.form)
         if "favoritePkmn" in request.form or "favoriteShinyPkmn" in request.form:
-            #current_user.favoritePkmn = f"{}"
-            pokedexID = session.get('pokedexID', current_user.userName)
-            if "favoritePkmn" in request.form:
-                sprite = session.get('sprite', current_user.userName)
-            else:
-                sprite = session.get('shinySprite', current_user.userName)
+            pokedexID = session.pop('pokedexID', current_user.userName)
+            shiny = False
+            if "favoriteShinyPkmn" in request.form:
+                shiny = True
 
-            print("$$$$$$$$$$$$$$", pokedexID, sprite)
+            try:
+                current_user.favoritePkmn = f"{pokedexID},{'s' if shiny else 'd'}"
+                db.session.commit()
+                flash("Favorite successfully assigned!", "success")
+            except:
+                db.session.rollback()
+                flash("Error assigning favorite...", "error")
 
         elif "pokedexInput" in request.form and form.validate_on_submit():
             pokemonData = pokedex.returnPokemonData(form, favorite=True)
@@ -184,9 +188,9 @@ def favorite():
                 if isinstance(unownWord[0], int):
                     return render_template("favorite.jinja", form=form, errorCode=unownWord[0])
                 return render_template("favorite.jinja", form=form, unownWord=unownWord)
+            
             session['pokedexID'] = pokedexID
-            session['shinySprite'] = shinySprite
-            session['sprite'] = sprite
+            
             return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
 
     return render_template("favorite.jinja", form=form)

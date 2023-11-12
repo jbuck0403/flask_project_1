@@ -34,13 +34,14 @@
               <img src="{{ spriteURL }}" alt="" height="" width="" class="sprite">
               <img src="{{ shinySpriteURL }}" alt="" height="" width="" class="sprite">
             </div>
-            <div class="favorite-btn-container"></div>
-            <form method="post">
-              {{ form.favoritePkmn(class="btn") }}
-            </form>
-            <form method="post">
-              {{ form.favoriteShinyPkmn(class="btn") }}
-            </form>
+            <div class="favorite-btn-container">
+              <form method="post">
+                {{ form.favoritePkmn(class="btn") }}
+              </form>
+              <form method="post">
+                {{ form.favoriteShinyPkmn(class="btn") }}
+              </form>
+            </div>
           </div>
         {% endif %}
       </div>
