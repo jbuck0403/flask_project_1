@@ -92,6 +92,8 @@ def account():
             if userNameForm.validate_on_submit():
                 if not userNameForm.updateUserName():
                     flash("Error updating User Name...", "error")
+                else:
+                    flash("User Name changed successfully!", "success")
             else:
                 userNameForm.changeUserName.data = ""
                 return render_account(form=userNameForm, requestUserNameChange=True)
@@ -103,6 +105,8 @@ def account():
             if passwordForm.validate_on_submit():
                 if not passwordForm.updatePassword():
                     flash("Error updating password...", "error")
+                else:
+                    flash("Password changed successfully!", "success")
             else:
                 return render_account(form=passwordForm, requestPasswordChange=True)
             
@@ -114,6 +118,7 @@ def account():
                 if not deleteAccountForm.deleteAccount():
                     flash("Error deleting account...", "error")
                 else:
+                    flash("Account deleted successfully.", "success")
                     return redirect(url_for("landingPage"))
             else:
                 return render_account(form=deleteAccountForm, requestDeleteAccount=True)
@@ -161,7 +166,6 @@ def favorite():
     pokedex = Pokedex(form)
 
     if request.method == "POST":
-        print(request.form)
         if "favoritePkmn" in request.form or "favoriteShinyPkmn" in request.form:
             pokedexID = session.pop('pokedexID', current_user.userName)
             shiny = False
