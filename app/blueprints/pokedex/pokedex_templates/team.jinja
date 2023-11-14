@@ -1,13 +1,30 @@
 {% extends "base.jinja" %}
 {% block content %}
-  <div class="app-container">
-    <div>
-      <div class="content-wrapper">
-        {% for pkmn in pkmnTeam %}<img src="{{ pkmn }}" alt="" height="" width="" class="sprite">{% endfor %}
+  <form method="post">
+    <div class="app-container">
+      <div>
+        <div class="content-wrapper">
+          <div class="team-container">
+            {% for pkmn in pkmnTeam %}
+              {% if sendingToBox %}
+                <div class="sprite-and-btn">
+                  <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
+                  {{ form.sendToBoxBtn(class="btn", value=loop.index) }}
+                </div>
+              {% else %}
+                <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="input-form-wrapper">
+          {% if sendingToBox %}
+            {{ form.cancelBtn(class="btn delete-btn") }}
+          {% else %}
+            {{ form.sendToBoxBtn(class="btn delete-btn") }}
+          {% endif %}
+        </div>
       </div>
-      <form method="post">
-        <div class="input-form-wrapper">{{ form.sendToBox(class="btn delete-btn") }}</div>
-      </form>
     </div>
-  </div>
+  </form>
 {% endblock content %}

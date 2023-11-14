@@ -21,3 +21,12 @@ CHANGELOG 4
 - added ability to pick an account favorite pokemon that displays in the top right
 - added "Are you sure?" button after logout button
 - cleaned up account management ui/ux
+
+CHANGELOG 5
+
+- added catch functionality - store a team of up to 6 pokemon in the db per user
+- added display team page
+
+CHANGELOG 6
+
+- added ability to remove pokemon from team

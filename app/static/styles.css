@@ -330,3 +330,13 @@ form {
   top: 1%;
   right: 1%;
 }
+
+.sprite-and-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-container {
+  display: flex;
+}

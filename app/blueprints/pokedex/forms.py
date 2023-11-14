@@ -6,14 +6,15 @@ from app.models import PkmnTeam
 
 class PokedexInputForm(FlaskForm):
     pokedexInput = StringField('See Pokémon Stats', validators=[notEmpty, verifyAllowedInput])
-    favoritePkmn = SubmitField('Choose Normal')
-    favoriteShinyPkmn = SubmitField('Choose Shiny')
-    catchPkmn = SubmitField('Throw a Poké Ball')
-    sendToBox = SubmitField('Send To Box')
+    favoritePkmnBtn = SubmitField('Choose Normal')
+    favoriteShinyPkmnBtn = SubmitField('Choose Shiny')
+    catchPkmnBtn = SubmitField('Throw a Poké Ball')
+    sendToBoxBtn = SubmitField('Send To Box')
+    cancelBtn = SubmitField('Cancel')
 
     def returnTeam(self, numInTeam=False):
-        team = [[pkmn.pkmnID, pkmn.shiny] for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
-        print(team)
+        team = [[pkmn.pkmnID, pkmn.shiny, pkmn.id] for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
+        
         if numInTeam == True:
             return len(team)
         else:

@@ -31,7 +31,6 @@ def pokedex():
         if  spriteShinyURL == None or not shinySpriteResponse.ok:
             return pokedex.render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL)
 
-        print(spriteURL)
         return pokedex.render_pokedex(pokemonInfoDict=pokemonInfoDict.items(), spriteURL=spriteURL, spriteShinyURL=spriteShinyURL)
         
     
@@ -86,7 +85,7 @@ def catch():
     form.pokedexInput.label.text = "Catch Pokémon"
 
     if request.method == "POST":
-        if "catchPkmn" in request.form:
+        if "catchPkmnBtn" in request.form:
             if form.returnTeam(numInTeam=True) < 6:
                 pokedexID = session.pop('pokedexID')
                 shiny = session.pop('shiny')
@@ -132,7 +131,24 @@ def team():
     pkmnTeam = form.returnTeam()
     pkmnTeamURLS = [pokedex.returnSpriteURL(pkmn[0], "pokemon", pkmn[1]) for pkmn in pkmnTeam]
 
-    if request.form == 'POST':
-        pass
+    if request.method == 'POST':
+        if 'sendToBoxBtn' in request.form:
+            
+            if request.form.get('sendToBoxBtn').strip().isdigit():
+            
+                index = int(request.form.get('sendToBoxBtn').strip()) - 1
+
+                try:
+                    pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.id == pkmnTeam[index][2]).first()
+                    db.session.delete(pkmnToDelete)
+                    db.session.commit()
+                    flash("Successfully sent Pokémon to Box!", "success")
+                    pkmnTeam = form.returnTeam()
+                    pkmnTeamURLS = [pokedex.returnSpriteURL(pkmn[0], "pokemon", pkmn[1]) for pkmn in pkmnTeam]
+                except:
+                    db.session.rollback()
+                    flash("Error sending Pokémon to Box...", "error")
+
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, sendingToBox=True)
 
     return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS)

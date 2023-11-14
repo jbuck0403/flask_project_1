@@ -49,7 +49,6 @@ class Pokedex():
 
     def returnPokemonData(self, form, favorite=False, catch=False):
         id = form.pokedexInput.data.strip()
-        print(id)
 
         url = f"https://pokeapi.co/api/v2/pokemon/{id}"
         response = requests.get(url)
@@ -68,7 +67,7 @@ class Pokedex():
             return name, pokedexID, spriteURL, spriteShinyURL
         elif catch:
             shinyChance = random.randint(0,10)
-            print(shinyChance)
+            
             return name, pokedexID, spriteShinyURL if shinyChance == 5 else spriteURL, True if shinyChance == 5 else False
         
         abilities = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == False]
