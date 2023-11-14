@@ -15,3 +15,14 @@ class User(db.Model, UserMixin):
     def __init__(self, userName, password):
         self.userName = userName
         self.password = generate_password_hash(password)
+
+class PkmnTeam(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    pkmnID = db.Column(db.Integer, nullable=False)
+    trainerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    shiny = db.Column(db.Boolean, nullable=False)
+
+    def __init__(self, pkmnID, trainerID, shiny):
+        self.pkmnID = pkmnID,
+        self.trainerID = trainerID
+        self.shiny = shiny

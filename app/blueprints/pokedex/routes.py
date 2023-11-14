@@ -1,7 +1,7 @@
 from flask import request, render_template, flash, session
 import requests
 from .forms import PokedexInputForm
-from app.models import db
+from app.models import db, PkmnTeam
 from flask_login import current_user, login_required
 from .Pokedex import Pokedex
 from . import pokedexBP
@@ -42,6 +42,7 @@ def pokedex():
 def favorite():
     form = PokedexInputForm()
     pokedex = Pokedex(form)
+    form.pokedexInput.label.text = "Choose Favorite Pokémon"
 
     if request.method == "POST":
         if "favoritePkmn" in request.form or "favoriteShinyPkmn" in request.form:
@@ -76,3 +77,62 @@ def favorite():
             return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
 
     return render_template("favorite.jinja", form=form)
+
+@pokedexBP.route('/catch', methods=['GET','POST'])
+@login_required
+def catch():
+    form = PokedexInputForm()
+    pokedex = Pokedex(form)
+    form.pokedexInput.label.text = "Catch Pokémon"
+
+    if request.method == "POST":
+        if "catchPkmn" in request.form:
+            if form.returnTeam(numInTeam=True) < 6:
+                pokedexID = session.pop('pokedexID')
+                shiny = session.pop('shiny')
+                name = session.pop('name')
+                
+                try:
+                    newPkmn = PkmnTeam(pokedexID, current_user.id, shiny)
+                    db.session.add(newPkmn)
+                    db.session.commit()
+                    flash(f"{name} caught!", "success")
+                except:
+                    db.session.rollback()
+                    flash(f"Error catching {name}...", "error")
+            else:
+                flash("Team is full...", "warning")
+
+        elif "pokedexInput" in request.form and form.validate_on_submit():
+            pokemonData = pokedex.returnPokemonData(form, catch=True)
+            if not isinstance(pokemonData, int):
+                name, pokedexID, sprite, shiny = pokemonData
+            else:
+                sprite = pokemonData
+            form.pokedexInput.data = ""
+            if isinstance(sprite, int):
+                unownWord = pokedex.unownSpeller()
+                if isinstance(unownWord[0], int):
+                    return render_template("catch.jinja", form=form, errorCode=unownWord[0])
+                return render_template("catch.jinja", form=form, unownWord=unownWord)
+            
+            session['pokedexID'] = pokedexID
+            session['shiny'] = shiny
+            session['name'] = name
+            
+            return render_template("catch.jinja", form=form, spriteURL=sprite, name=name)
+
+    return render_template("catch.jinja", form=form)
+
+@pokedexBP.route('/team', methods=['GET','POST'])
+@login_required
+def team():
+    form = PokedexInputForm()
+    pokedex = Pokedex(form)
+    pkmnTeam = form.returnTeam()
+    pkmnTeamURLS = [pokedex.returnSpriteURL(pkmn[0], "pokemon", pkmn[1]) for pkmn in pkmnTeam]
+
+    if request.form == 'POST':
+        pass
+
+    return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS)

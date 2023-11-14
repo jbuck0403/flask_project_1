@@ -305,13 +305,13 @@ form {
   margin-top: 20px;
 }
 
-.delete-account-btn {
+.delete-btn {
   position: absolute;
   bottom: 1%;
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.delete-account-btn:hover {
+.delete-btn:hover {
   background-color: var(--primary-btn-color);
   color: white;
 }

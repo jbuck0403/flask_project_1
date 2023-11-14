@@ -1,0 +1,13 @@
+{% extends "base.jinja" %}
+{% block content %}
+  <div class="app-container">
+    <div>
+      <div class="content-wrapper">
+        {% for pkmn in pkmnTeam %}<img src="{{ pkmn }}" alt="" height="" width="" class="sprite">{% endfor %}
+      </div>
+      <form method="post">
+        <div class="input-form-wrapper">{{ form.sendToBox(class="btn delete-btn") }}</div>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

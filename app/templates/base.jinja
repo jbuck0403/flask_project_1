@@ -21,14 +21,20 @@
           <a href='{{ url_for("account.login") }}'>Log In</a>
         </li>
         <li>
-          <a href='{{ url_for("account.signup") }}'">Create Account</a>
+          <a href='{{ url_for("account.signup") }}'>Create Account</a>
         </li>
       {% else %}
         <li>
-          <a href='{{ url_for("account.account") }}'">{{ current_user.userName }}</a>
+          <a href='{{ url_for("account.account") }}'>{{ current_user.userName }}</a>
         </li>
         <li>
-          <a href='{{ url_for("pokedexBP.favorite") }}'">Favorite</a>
+          <a href='{{ url_for("pokedexBP.favorite") }}'>Favorite</a>
+        </li>
+        <li>
+          <a href='{{ url_for("pokedexBP.catch") }}'>Catch</a>
+        </li>
+        <li>
+          <a href='{{ url_for("pokedexBP.team") }}'>Team</a>
         </li>
       {% endif %}
       <li>
