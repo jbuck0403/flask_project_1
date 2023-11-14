@@ -20,7 +20,13 @@ class Pokedex():
             unownIndexes = [(ord(char) - 97) + 10000 if char != 'a' else 201 for char in wordToSpell.lower()]
         
         return [self.returnSpriteURL(pkmn=index, pkmnType="pokemon-form") for index in unownIndexes]
-        
+    
+    def unownErrorMessage(self, form, template):
+        unownWord = self.unownSpeller()
+        if isinstance(unownWord[0], int):
+            return render_template(template, form=form, errorCode=unownWord[0])
+        return render_template(template, form=form, unownWord=unownWord)
+
     def returnSpriteURL(self, pkmn=10027, pkmnType="pokemon-form", shiny=False):
         """returns a pokemon sprite from id or name (accepts string or int)
         

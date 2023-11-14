@@ -66,10 +66,7 @@ def favorite():
                 sprite = pokemonData
             form.pokedexInput.data = ""
             if isinstance(sprite, int):
-                unownWord = pokedex.unownSpeller()
-                if isinstance(unownWord[0], int):
-                    return render_template("favorite.jinja", form=form, errorCode=unownWord[0])
-                return render_template("favorite.jinja", form=form, unownWord=unownWord)
+                pokedex.unownErrorMessage(form, "favorite.jinja")
             
             session['pokedexID'] = pokedexID
             
@@ -110,10 +107,7 @@ def catch():
                 sprite = pokemonData
             form.pokedexInput.data = ""
             if isinstance(sprite, int):
-                unownWord = pokedex.unownSpeller()
-                if isinstance(unownWord[0], int):
-                    return render_template("catch.jinja", form=form, errorCode=unownWord[0])
-                return render_template("catch.jinja", form=form, unownWord=unownWord)
+                pokedex.unownErrorMessage(form, "catch.jinja")
             
             session['pokedexID'] = pokedexID
             session['shiny'] = shiny

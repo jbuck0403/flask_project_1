@@ -30,3 +30,7 @@ CHANGELOG 5
 CHANGELOG 6
 
 - added ability to remove pokemon from team
+
+CHANGELOG 7
+
+- simplified unown error messages into Pokedex.unownErrorMessage method
