@@ -19,9 +19,9 @@ def pokedex():
     if request.method == "POST" and form.validate_on_submit():
 
         pokemonData = pokedex.returnPokemonData(form)
-
+        print(pokemonData)
         if isinstance(pokemonData, int):
-            return render_pokedex(unownWord=pokedex.unownSpeller(True))
+            return pokedex.unownErrorMessage(form, 'pokedex.jinja')
         else:
             pokemonInfoDict, spriteURL, spriteShinyURL = pokemonData
 
@@ -40,43 +40,41 @@ def pokedex():
     
     return render_pokedex()
 
-# @pokedexBP.route("/favorite", methods=['GET', 'POST'])
-# @login_required
-# def favorite():
-#     form = PokedexInputForm()
-#     pokedex = Pokedex(form)
-#     form.pokedexInput.label.text = "Choose Favorite Pokémon"
+@pokedexBP.route("/favorite", methods=['GET', 'POST'])
+@login_required
+def favorite():
+    form = PokedexInputForm()
+    pokedex = Pokedex(form)
+    form.pokedexInput.label.text = "Choose Favorite Pokémon"
 
-#     if request.method == "POST":
-#         if "favoritePkmnBtn" in request.form or "favoriteShinyPkmnBtn" in request.form:
-#             pokedexID = session.pop('pokedexID', current_user.userName)
-#             shiny = False
-#             if "favoriteShinyPkmnBtn" in request.form:
-#                 shiny = True
+    if request.method == "POST":
+        if "favoritePkmnBtn" in request.form or "favoriteShinyPkmnBtn" in request.form:
+            pokedexID = session.pop('pokedexID', current_user.userName)
+            shiny = False
+            if "favoriteShinyPkmnBtn" in request.form:
+                shiny = True
 
-#             try:
-#                 current_user.favoritePkmn = f"{pokedexID},{'s' if shiny else 'd'}"
-#                 db.session.commit()
-#                 flash("Favorite successfully assigned!", "success")
-#             except:
-#                 db.session.rollback()
-#                 flash("Error assigning favorite...", "error")
+            try:
+                current_user.favoritePkmn = f"{pokedexID},{'s' if shiny else 'd'}"
+                db.session.commit()
+                flash("Favorite successfully assigned!", "success")
+            except:
+                db.session.rollback()
+                flash("Error assigning favorite...", "error")
 
-#         elif "pokedexInput" in request.form and form.validate_on_submit():
-#             pokemonData = pokedex.returnPokemonData(form, favorite=True)
-#             if not isinstance(pokemonData, int):
-#                 name, pokedexID, sprite, shinySprite = pokemonData
-#             else:
-#                 sprite = pokemonData
-#             form.pokedexInput.data = ""
-#             if isinstance(sprite, int):
-#                 pokedex.unownErrorMessage(form, "favorite.jinja")
+        elif "pokedexInput" in request.form and form.validate_on_submit():
+            pokemonData = pokedex.returnPokemonData(form, favorite=True)
+            form.pokedexInput.data = ""
+            if not isinstance(pokemonData, int):
+                name, pokedexID, sprite, shinySprite = pokemonData
+            else:
+                # sprite = pokemonData
+                return pokedex.unownErrorMessage(form, "favorite.jinja")
             
-#             session['pokedexID'] = pokedexID
-            
-#             return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
+            session['pokedexID'] = pokedexID
+            return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
 
-#     return render_template("favorite.jinja", form=form)
+    return render_template("favorite.jinja", form=form)
 
 # @pokedexBP.route('/catch', methods=['GET','POST'])
 # @login_required

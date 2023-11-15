@@ -20,11 +20,10 @@ class Pokedex():
 
         return unownWord
     
-    def unownErrorMessage(self, form, template):
+    def unownErrorMessage(self, form, *args):
         unownWord = self.unownSpeller()
-        if isinstance(unownWord[0], int):
-            return render_template(template, form=form, errorCode=unownWord[0])
-        return render_template(template, form=form, unownWord=unownWord)
+        
+        return render_template(*args, form=form, unownWord=unownWord)
 
     # def returnSpriteURL(self, pkmn=10027, pkmnType="pokemon-form", shiny=False):
     #     """returns a pokemon sprite from id or name (accepts string or int)
@@ -52,7 +51,7 @@ class Pokedex():
     #         else:
     #             return self.render_pokedex(errorCode=errorCode, sprite=sprite)
 
-    def returnPokemonData(self, form, favorite=False, catch=False):
+    def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False):
         def populatePkmnTableFromAPI(data):
             def unpackTuple(arr):
                 if len(arr) > 1:
@@ -109,21 +108,23 @@ class Pokedex():
                 splitName = name.split('-')
                 return '-'.join([split.title() for split in splitName])
             
-        id = titlePokemon(form.pokedexInput.data.strip().lower())
-        print(id)
+        if favoriteSprite:
+            id = form
+        else:
+            id = titlePokemon(form.pokedexInput.data.strip().lower())
+
         if id.isdigit():
             identifier = Pkmn.id
         else:
             identifier = Pkmn.name
 
         pokemon = Pkmn.query.filter(identifier == id).first()
-        print(pokemon)
         
         if pokemon:
-            if not favorite and not catch:
+            if not favorite and not catch and not favoriteSprite:
                 return returnPokemonInfoDict(pokemon)
         else:
-            url = f"https://pokeapi.co/api/v2/pokemon/{id}"
+            url = f"https://pokeapi.co/api/v2/pokemon/{id.lower()}"
             response = requests.get(url)
 
             if not response.ok or id.isspace():
@@ -141,5 +142,10 @@ class Pokedex():
         elif catch:
             shinyChance = random.randint(0,10)
             return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 else pokemon.sprite
+        elif favoriteSprite:
+            if shiny:
+                return pokemon.spriteShiny
+            else:
+                return pokemon.sprite
         else:
             return returnPokemonInfoDict(pokemon)

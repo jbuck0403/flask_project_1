@@ -27,10 +27,10 @@
         <li>
           <a href='{{ url_for("account.account") }}'>{{ current_user.userName }}</a>
         </li>
-        {# <li>
+        <li>
           <a href='{{ url_for("pokedexBP.favorite") }}'>Favorite</a>
         </li>
-        <li>
+        {# <li>
           <a href='{{ url_for("pokedexBP.catch") }}'>Catch</a>
         </li>
         <li>
@@ -43,13 +43,13 @@
     </ul>
   </nav>
   {% if current_user.is_authenticated %}
-    {# <div class="display-favorite">
+    <div class="display-favorite">
       <img src="{{ favoriteSprite }}"
            alt=""
            height=""
            width=""
            class="favorite-sprite">
-    </div> #}
+    </div>
   {% endif %}
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
