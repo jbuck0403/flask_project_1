@@ -34,3 +34,8 @@ CHANGELOG 6
 CHANGELOG 7
 
 - simplified unown error messages into Pokedex.unownErrorMessage method
+
+CHANGELOG 8
+
+- can no longer change your password to the same password
+- can no longer change your user name to the same user name

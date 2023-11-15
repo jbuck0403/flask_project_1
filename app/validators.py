@@ -35,3 +35,11 @@ def verifyPassword(_, currentPassword):
     
     if not check_password_hash(currentUserPassword, currentPassword.data):
         raise ValidationError('Invalid password...')
+    
+def verifyDifferentUserName(_, userInput):
+    if userInput.data == current_user.userName:
+        raise ValidationError('Must be different from current User Name...')
+    
+def verifyDifferentPassword(_, userInput):
+    if check_password_hash(current_user.password, userInput.data):
+        raise ValidationError('Must be different from current password...')

@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired, EqualTo, ValidationError
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.models import User, db
 from flask_login import login_user, current_user
-from app.validators import notEmpty, verifyUserNameRequirements, verifyPasswordRequirements, verifyPassword, DELETE_ACCOUNT_KEYWORD
+from app.validators import notEmpty, verifyUserNameRequirements, verifyPasswordRequirements, verifyPassword, DELETE_ACCOUNT_KEYWORD, verifyDifferentUserName, verifyDifferentPassword
 
 class LoginForm(FlaskForm):
     userName = StringField("User Name", validators=[notEmpty])
@@ -41,7 +41,7 @@ class AccountForm(FlaskForm):
     confirmLogoutBtn = SubmitField("Confirm Logout")
 
 class UpdateAccountUserNameForm(AccountForm):
-    changeUserName = StringField("New User Name", validators=[notEmpty, verifyUserNameRequirements])
+    changeUserName = StringField("New User Name", validators=[notEmpty, verifyDifferentUserName, verifyUserNameRequirements])
     password = PasswordField("Password", validators=[notEmpty, verifyPassword])
 
     def updateUserName(self):
@@ -54,7 +54,7 @@ class UpdateAccountUserNameForm(AccountForm):
             return False
         
 class UpdateAccountPasswordForm(AccountForm):
-    newPassword = PasswordField("New Password", validators=[verifyPasswordRequirements])
+    newPassword = PasswordField("New Password", validators=[verifyPasswordRequirements, verifyDifferentPassword])
     confirmNewPassword = PasswordField("Confirm New Password", validators=[EqualTo('newPassword', message="Passwords must match...")])
     currentPassword = PasswordField("Current Password", validators=[notEmpty, verifyPassword])
 
