@@ -54,7 +54,7 @@ form {
 }
 
 .sprite {
-  height: 300px;
+  height: 290px;
   width: auto;
 }
 
@@ -272,22 +272,6 @@ form {
   color: red;
 }
 
-.flashed-messages {
-  animation: disappear 5s forwards;
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-@keyframes disappear {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
 .input-form-wrapper {
   display: flex;
   flex-direction: column;
@@ -332,4 +316,42 @@ form {
 
 .team-container {
   display: flex;
+}
+
+.flashed-message {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@keyframes disappear {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.flashed-message1 {
+  animation: disappear 5s forwards;
+}
+
+.flashed-message2 {
+  opacity: 0;
+  animation: fadeIn 0.05s ease-in-out 5s forwards, disappear 5s 5s forwards;
+}
+
+.flashed-message3 {
+  opacity: 0;
+  animation: fadeIn 0.05s ease-in-out 10s forwards, disappear 5s 10s forwards;
 }

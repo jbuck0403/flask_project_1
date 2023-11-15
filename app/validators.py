@@ -1,5 +1,5 @@
 from wtforms.validators import ValidationError
-from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash
 from app.models import User
 from flask_login import current_user
 import re
