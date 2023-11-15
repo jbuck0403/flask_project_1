@@ -51,7 +51,7 @@ class Pokedex():
     #         else:
     #             return self.render_pokedex(errorCode=errorCode, sprite=sprite)
 
-    def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False):
+    def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False, team=False):
         def populatePkmnTableFromAPI(data):
             def unpackTuple(arr):
                 if len(arr) > 1:
@@ -108,8 +108,8 @@ class Pokedex():
                 splitName = name.split('-')
                 return '-'.join([split.title() for split in splitName])
             
-        if favoriteSprite:
-            id = form
+        if favoriteSprite or team:
+            id = str(form)
         else:
             id = titlePokemon(form.pokedexInput.data.strip().lower())
 
@@ -121,7 +121,7 @@ class Pokedex():
         pokemon = Pkmn.query.filter(identifier == id).first()
         
         if pokemon:
-            if not favorite and not catch and not favoriteSprite:
+            if not favorite and not catch and not favoriteSprite and not team:
                 return returnPokemonInfoDict(pokemon)
         else:
             url = f"https://pokeapi.co/api/v2/pokemon/{id.lower()}"
@@ -141,8 +141,8 @@ class Pokedex():
             return pokemon.name, pokemon.id, pokemon.sprite, pokemon.spriteShiny
         elif catch:
             shinyChance = random.randint(0,10)
-            return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 else pokemon.sprite
-        elif favoriteSprite:
+            return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 else pokemon.sprite, True if shinyChance == 5 else False
+        elif favoriteSprite or team:
             if shiny:
                 return pokemon.spriteShiny
             else:

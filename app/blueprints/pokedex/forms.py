@@ -13,8 +13,8 @@ class PokedexInputForm(FlaskForm):
     cancelBtn = SubmitField('Cancel')
 
     def returnTeam(self, numInTeam=False):
-        team = [[pkmn.pkmnID, pkmn.shiny, pkmn.id] for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
-        
+        # team = [[pkmn.pkmnID, pkmn.shiny, pkmn.id] for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
+        team = [pkmn for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
         if numInTeam == True:
             return len(team)
         else:

@@ -9,10 +9,7 @@ def injectFavoriteSprite():
         favoritePkmn = current_user.favoritePkmn.split(',')
         pkmnID, spriteType = favoritePkmn[0], False if favoritePkmn[1] == 'd' else True
 
-        
-
         favoriteSprite = pokedex.returnPokemonData(pkmnID, favoriteSprite=True, shiny=spriteType)
-        # favoriteSprite = pokedex.returnSpriteURL(pkmn=pkmnID, pkmnType='pokemon', shiny=spriteType)
     else:
         favoriteSprite = None
     return dict(favoriteSprite=favoriteSprite)
