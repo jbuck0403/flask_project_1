@@ -18,7 +18,7 @@ class User(db.Model, UserMixin):
 
 class PkmnTeam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    pkmnID = db.Column(db.Integer, nullable=False)
+    pkmnID = db.Column(db.Integer, db.ForeignKey('pkmn.id'), nullable=False)
     trainerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     shiny = db.Column(db.Boolean, nullable=False)
 
