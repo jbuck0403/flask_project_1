@@ -65,17 +65,11 @@
     </div>
   </div>
   <script>
-    // Get all elements with the class 'delay-show-bottom'
-    var elements = document.getElementsByClassName('delay-show-bottom');
+    let elements = document.getElementsByClassName('delay-show-bottom');
+    let classToRemove = 'delay-show-bottom';    
+    let timeInterval = 2000;
 
-    // Define the class you want to remove
-    var classToRemove = 'delay-show-bottom';
-
-    // Define the time interval (in milliseconds) after which you want to remove the class
-    var timeInterval = 2000; // 2000 milliseconds (2 seconds)
-
-    // Loop through the elements and use setTimeout to remove the class from each element
-    for (var i = 0; i < elements.length; i++) {
+    for (let i = 0; i < elements.length; i++) {
         setTimeout(function (elementToRemoveClass) {
             elementToRemoveClass.classList.remove(classToRemove);
         }, timeInterval, elements[i]);
