@@ -3,7 +3,7 @@
   Account
 {% endblock title %}
 {% block content %}
-  <div class="form-error">
+  <div class="form-error delay-show-bottom">
     {% if requestUserNameChange %}
       {% if form.changeUserName.errors %}
         {{ form.changeUserName.errors[0] }}
@@ -32,11 +32,15 @@
     {% if requestConfirmLogout %}
       <div class="delay-show-top">Are you sure?</div>
     {% elif requestUserNameChange %}
-      <div class="delay-show-top">Tired of {{ current_user.userName }}?</div>
+      <div class="disappear">
+        <div class="delay-show-top">Tired of {{ current_user.userName }}?</div>
+      </div>
     {% elif requestPasswordChange %}
-      <div class="delay-show-top">This one too long?</div>
+      <div class="disappear">
+        <div class="delay-show-top">This one too long?</div>
+      </div>
     {% elif requestDeleteAccount %}
-      <div class="delay-show-top">This cannot be undone</div>
+      <div class="delay-show-top error">This cannot be undone</div>
     {% else %}
       <div class="delay-show-top">Hello, {{ current_user.userName }}!</div>
     {% endif %}

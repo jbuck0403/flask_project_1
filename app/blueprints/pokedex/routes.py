@@ -73,7 +73,7 @@ def favorite():
             
             session['pokedexID'] = pokedexID
             return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
-
+    form.pokedexInput.data = ""
     return render_template("favorite.jinja", form=form)
 
 @pokedexBP.route('/remove_favorite')
@@ -135,7 +135,7 @@ def catch():
             session['name'] = name
             
             return render_template("catch.jinja", form=form, spriteURL=sprite, name=name)
-
+    form.pokedexInput.data = ""    
     return render_template("catch.jinja", form=form)
 
 @pokedexBP.route('/team', methods=['GET','POST'])

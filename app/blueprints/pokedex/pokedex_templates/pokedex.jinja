@@ -3,7 +3,7 @@
   Pokedex
 {% endblock title %}
 {% block content %}
-  <div class="form-error">
+  <div class="form-error delay-show-bottom">
     {% if form.pokedexInput.errors %}
       {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
     {% endif %}

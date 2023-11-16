@@ -55,7 +55,7 @@ class UpdateAccountUserNameForm(AccountForm):
         
 class UpdateAccountPasswordForm(AccountForm):
     newPassword = PasswordField("New Password", validators=[verifyPasswordRequirements, verifyDifferentPassword])
-    confirmNewPassword = PasswordField("Confirm New Password", validators=[EqualTo('newPassword', message="Passwords must match...")])
+    confirmNewPassword = PasswordField("Confirm New Password", validators=[EqualTo('newPassword', message="New password and confirm new password must match...")])
     currentPassword = PasswordField("Current Password", validators=[notEmpty, verifyPassword])
 
     def updatePassword(self):

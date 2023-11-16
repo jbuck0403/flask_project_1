@@ -266,6 +266,11 @@ nav {
   text-align: center;
   font-size: 50px;
   color: red;
+  animation: disappear 5s forwards;
+}
+
+.disappear {
+  animation: disappear 5s ease-in-out 5s forwards;
 }
 
 .success {

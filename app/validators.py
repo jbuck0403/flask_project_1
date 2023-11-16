@@ -6,10 +6,10 @@ import re
 
 DELETE_ACCOUNT_KEYWORD = "DELETE"
 
-def verifyAllowedInput(_, userInput):
+def verifyAllowedInput(form, userInput):
     pattern = re.compile(r'^[\-a-zA-Z0-9]*$')
     if not pattern.match(userInput.data):
-        raise ValidationError("Only letters and numbers...")
+        raise ValidationError("Only letters, numbers and dashes...")
 
 def verifyUniqueUserName(_, userName):
     queriedUser = User.query.filter(User.userName == userName.data).first()
