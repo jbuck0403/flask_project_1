@@ -39,3 +39,8 @@ CHANGELOG 8
 
 - can no longer change your password to the same password
 - can no longer change your user name to the same user name
+
+CHANGELOG 9
+
+- added shake animation to buttons
+- smoothed choppy sprite loading with fade animations

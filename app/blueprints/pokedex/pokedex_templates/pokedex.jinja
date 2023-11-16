@@ -3,42 +3,38 @@
   Pokedex
 {% endblock title %}
 {% block content %}
-  <div class="app-container">
-    <div>
-      <div class="form-error">
-        {% if form.pokedexInput.errors %}
-          {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
-        {% endif %}
+  <div class="form-error">
+    {% if form.pokedexInput.errors %}
+      {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
+    {% endif %}
+  </div>
+  <div class="content-wrapper">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="pokedex-wrapper">
+        {{ form.pokedexInput.label(for="pokemonID") }}
+        <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
       </div>
-      <div class="content-wrapper">
-        <form method="post">
-          {{ form.hidden_tag() }}
-          <div class="pokedex-wrapper">
-            {{ form.pokedexInput.label(for="pokemonID") }}
-            <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
-          </div>
-        </form>
-        {% if unownMessage %}
-          <div class="error">{{ unownMessage }}</div>
-        {% elif pokemonInfoDict %}
-          <div class="pokemon-data-container">
-            {% if spriteURL %}
-              <div class="sprite-container">
-                <img src="{{ spriteURL }}" alt="" class="sprite" height="" width="">
-                {% if spriteShinyURL %}<img src="{{ spriteShinyURL }}" alt="" class="sprite" height="" width="">{% endif %}
-              </div>
-            {% endif %}
-            <table class="pokemon-data">
-              {% for dataLabel, data in pokemonInfoDict %}
-                <tr>
-                  <td class="data-label">{{ dataLabel }}</td>
-                  <td class="data">{{ data }}</td>
-                </tr>
-              {% endfor %}
-            </table>
+    </form>
+    {% if unownMessage %}
+      <div class="error">{{ unownMessage }}</div>
+    {% elif pokemonInfoDict %}
+      <div class="pokemon-data-container">
+        {% if spriteURL %}
+          <div class="sprite-container">
+            <img src="{{ spriteURL }}" alt="" class="sprite" height="" width="">
+            {% if spriteShinyURL %}<img src="{{ spriteShinyURL }}" alt="" class="sprite" height="" width="">{% endif %}
           </div>
         {% endif %}
+        <table class="pokemon-data">
+          {% for dataLabel, data in pokemonInfoDict %}
+            <tr>
+              <td class="data-label">{{ dataLabel }}</td>
+              <td class="data">{{ data }}</td>
+            </tr>
+          {% endfor %}
+        </table>
       </div>
-    </div>
+    {% endif %}
   </div>
 {% endblock content %}

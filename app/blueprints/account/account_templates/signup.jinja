@@ -1,35 +1,31 @@
 {% extends "base.jinja" %}
 {% block title %}
-  Sign Up
+  Create Account
 {% endblock title %}
 {% block content %}
-  <div class="input-container">
-    <div>
-      <div class="form-error">
-        {% if form.confirmPassword.errors %}
-          {% for error in form.confirmPassword.errors %}{{ error }}{% endfor %}
-        {% elif form.userName.errors %}
-          {% for error in form.userName.errors %}{{ error }}{% endfor %}
-        {% elif form.password.errors %}
-          {% for error in form.password.errors %}{{ error }}{% endfor %}
-        {% endif %}
-      </div>
-      <form method="post" class="input-form">
-        {{ form.hidden_tag() }}
-        <div class="input-wrapper">
-          <div class="input-label">
-            {{ form.userName.label }}
-            {{ form.password.label }}
-            {{ form.confirmPassword.label }}
-          </div>
-          <div class="input-field-container">
-            {{ form.userName(class="field") }}
-            {{ form.password(class="field") }}
-            {{ form.confirmPassword(class="field") }}
-          </div>
-        </div>
-        <div class="btn-wrapper">{{ form.createAccountBtn(class="btn create-account-btn") }}</div>
-      </form>
-    </div>
+  <div class="form-error">
+    {% if form.confirmPassword.errors %}
+      {% for error in form.confirmPassword.errors %}{{ error }}{% endfor %}
+    {% elif form.userName.errors %}
+      {% for error in form.userName.errors %}{{ error }}{% endfor %}
+    {% elif form.password.errors %}
+      {% for error in form.password.errors %}{{ error }}{% endfor %}
+    {% endif %}
   </div>
+  <form method="post" class="input-form">
+    {{ form.hidden_tag() }}
+    <div class="input-wrapper">
+      <div class="input-label">
+        {{ form.userName.label }}
+        {{ form.password.label }}
+        {{ form.confirmPassword.label }}
+      </div>
+      <div class="input-field-container">
+        {{ form.userName(class="field") }}
+        {{ form.password(class="field") }}
+        {{ form.confirmPassword(class="field") }}
+      </div>
+    </div>
+    <div class="input-form-wrapper">{{ form.createAccountBtn(class="btn create-account-btn") }}</div>
+  </form>
 {% endblock content %}

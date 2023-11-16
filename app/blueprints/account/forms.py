@@ -9,7 +9,7 @@ from app.validators import notEmpty, verifyUserNameRequirements, verifyPasswordR
 class LoginForm(FlaskForm):
     userName = StringField("User Name", validators=[notEmpty])
     password = PasswordField("Password", validators=[notEmpty])
-    loginBtn = SubmitField("Sign In")
+    loginBtn = SubmitField("Log In")
     signupBtn = SubmitField("Create Account")
 
     def attemptLogin(self):

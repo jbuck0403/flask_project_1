@@ -3,123 +3,119 @@
   Account
 {% endblock title %}
 {% block content %}
-  <div class="app-container">
-    <div>
-      <div class="form-error">
-        {% if requestUserNameChange %}
-          {% if form.changeUserName.errors %}
-            {{ form.changeUserName.errors[0] }}
-          {% elif form.password.errors %}
-            {{ form.password.errors[0] }}
-          {% endif %}
-        {% elif requestPasswordChange %}
-          {% if form.currentPassword.errors %}
-            {{ form.currentPassword.errors[0] }}
-          {% elif form.newPassword.errors %}
-            {{ form.newPassword.errors[0] }}
-          {% elif form.confirmNewPassword.errors %}
-            {{ form.confirmNewPassword.errors[0] }}
-          {% endif %}
-        {% elif requestDeleteAccount %}
-          {% if form.verifyIntentionToDelete.errors %}
-            {{ form.verifyIntentionToDelete.errors[0] }}
-          {% elif form.userName.errors %}
-            {{ form.userName.errors[0] }}
-          {% elif form.password.errors %}
-            {{ form.password.errors[0] }}
-          {% endif %}
-        {% endif %}
-      </div>
-      <div class="welcome-wrapper">
-        {% if requestConfirmLogout %}
-          <div>Are you sure?</div>
-        {% elif requestUserNameChange %}
-          <div>Tired of {{ current_user.userName }}?</div>
-        {% elif requestPasswordChange %}
-          <div>This one too long?</div>
-        {% elif requestDeleteAccount %}
-          <div>This cannot be undone</div>
-        {% else %}
-          <div>Hello, {{ current_user.userName }}!</div>
-        {% endif %}
-        <div class="input-form-wrapper">
-          {% if requestUserNameChange %}
-            <form method="post">
-              {{ form.hidden_tag() }}
-              <div class="input-wrapper">
-                <div class="input-label">
-                  {{ form.changeUserName.label }}
-                  {{ form.password.label }}
-                </div>
-                <div class="input-field-container">
-                  {{ form.changeUserName(class_="field") }}
-                  {{ form.password(class_="field") }}
-                </div>
-              </div>
-              <div class="input-form-wrapper">{{ form.changeUserNameBtn(class_="btn top-btn") }}</div>
-            </form>
-            <form method="post">
-              {{ form.cancelBtn(class_="btn top") }}
-            </form>
-          {% elif requestPasswordChange %}
-            <form method="post">
-              {{ form.hidden_tag() }}
-              <div class="input-wrapper">
-                <div class="input-label">
-                  {{ form.currentPassword.label }}
-                  {{ form.newPassword.label }}
-                  {{ form.confirmNewPassword.label }}
-                </div>
-                <div class="input-field-container">
-                  {{ form.currentPassword(class_="field") }}
-                  {{ form.newPassword(class_="field") }}
-                  {{ form.confirmNewPassword(class_="field") }}
-                </div>
-              </div>
-              <div class="input-form-wrapper">{{ form.changePasswordBtn(class_="btn top-btn") }}</div>
-            </form>
-            <form method="post">
-              {{ form.cancelBtn(class_="btn") }}
-            </form>
-          {% elif requestDeleteAccount %}
-            <form method="post">
-              {{ form.hidden_tag() }}
-              <div class="input-wrapper">
-                <div class="input-label">
-                  {{ form.verifyIntentionToDelete.label }}
-                  {{ form.userName.label }}
-                  {{ form.password.label }}
-                </div>
-                <div class="input-field-container">
-                  {{ form.verifyIntentionToDelete(class_="field") }}
-                  {{ form.userName(class_="field") }}
-                  {{ form.password(class_="field") }}
-                </div>
-              </div>
-              <div class="input-form-wrapper">{{ form.deleteAccountBtn(class_="btn top-btn") }}</div>
-            </form>
-            <form method="post">
-              {{ form.cancelBtn(class_="btn") }}
-            </form>
-          {% elif requestConfirmLogout %}
-            <form method="post">
-              <div class="input-form-wrapper">
-                {{ form.confirmLogoutBtn(class_="btn top-btn") }}
-                {{ form.cancelBtn(class_="btn") }}
-              </div>
-            </form>
-          {% else %}
-            <form method="post">
-              <div class="input-form-wrapper">
-                {{ form.changeUserNameBtn(class_="btn top-btn") }}
-                {{ form.changePasswordBtn(class_="btn") }}
-                {{ form.deleteAccountBtn(class_="btn delete-btn") }}
-                {{ form.logoutBtn(class_="btn logout-btn") }}
-              </div>
-            </form>
-          {% endif %}
-        </div>
-      </div>
+  <div class="form-error">
+    {% if requestUserNameChange %}
+      {% if form.changeUserName.errors %}
+        {{ form.changeUserName.errors[0] }}
+      {% elif form.password.errors %}
+        {{ form.password.errors[0] }}
+      {% endif %}
+    {% elif requestPasswordChange %}
+      {% if form.currentPassword.errors %}
+        {{ form.currentPassword.errors[0] }}
+      {% elif form.newPassword.errors %}
+        {{ form.newPassword.errors[0] }}
+      {% elif form.confirmNewPassword.errors %}
+        {{ form.confirmNewPassword.errors[0] }}
+      {% endif %}
+    {% elif requestDeleteAccount %}
+      {% if form.verifyIntentionToDelete.errors %}
+        {{ form.verifyIntentionToDelete.errors[0] }}
+      {% elif form.userName.errors %}
+        {{ form.userName.errors[0] }}
+      {% elif form.password.errors %}
+        {{ form.password.errors[0] }}
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="welcome-wrapper">
+    {% if requestConfirmLogout %}
+      <div>Are you sure?</div>
+    {% elif requestUserNameChange %}
+      <div>Tired of {{ current_user.userName }}?</div>
+    {% elif requestPasswordChange %}
+      <div>This one too long?</div>
+    {% elif requestDeleteAccount %}
+      <div>This cannot be undone</div>
+    {% else %}
+      <div>Hello, {{ current_user.userName }}!</div>
+    {% endif %}
+    <div class="input-form-wrapper">
+      {% if requestUserNameChange %}
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="input-wrapper">
+            <div class="input-label">
+              {{ form.changeUserName.label }}
+              {{ form.password.label }}
+            </div>
+            <div class="input-field-container">
+              {{ form.changeUserName(class_="field") }}
+              {{ form.password(class_="field") }}
+            </div>
+          </div>
+          <div class="input-form-wrapper">{{ form.changeUserNameBtn(class_="btn top-btn") }}</div>
+        </form>
+        <form method="post">
+          {{ form.cancelBtn(class_="btn top") }}
+        </form>
+      {% elif requestPasswordChange %}
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="input-wrapper">
+            <div class="input-label">
+              {{ form.currentPassword.label }}
+              {{ form.newPassword.label }}
+              {{ form.confirmNewPassword.label }}
+            </div>
+            <div class="input-field-container">
+              {{ form.currentPassword(class_="field") }}
+              {{ form.newPassword(class_="field") }}
+              {{ form.confirmNewPassword(class_="field") }}
+            </div>
+          </div>
+          <div class="input-form-wrapper">{{ form.changePasswordBtn(class_="btn top-btn") }}</div>
+        </form>
+        <form method="post">
+          {{ form.cancelBtn(class_="btn") }}
+        </form>
+      {% elif requestDeleteAccount %}
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="input-wrapper">
+            <div class="input-label">
+              {{ form.verifyIntentionToDelete.label }}
+              {{ form.userName.label }}
+              {{ form.password.label }}
+            </div>
+            <div class="input-field-container">
+              {{ form.verifyIntentionToDelete(class_="field") }}
+              {{ form.userName(class_="field") }}
+              {{ form.password(class_="field") }}
+            </div>
+          </div>
+          <div class="input-form-wrapper">{{ form.deleteAccountBtn(class_="btn top-btn") }}</div>
+        </form>
+        <form method="post">
+          {{ form.cancelBtn(class_="btn") }}
+        </form>
+      {% elif requestConfirmLogout %}
+        <form method="post">
+          <div class="input-form-wrapper">
+            {{ form.confirmLogoutBtn(class_="btn top-btn") }}
+            {{ form.cancelBtn(class_="btn") }}
+          </div>
+        </form>
+      {% else %}
+        <form method="post">
+          <div class="input-form-wrapper">
+            {{ form.changeUserNameBtn(class_="btn top-btn") }}
+            {{ form.changePasswordBtn(class_="btn") }}
+            {{ form.deleteAccountBtn(class_="btn delete-btn") }}
+            {{ form.logoutBtn(class_="btn logout-btn") }}
+          </div>
+        </form>
+      {% endif %}
     </div>
   </div>
 {% endblock content %}

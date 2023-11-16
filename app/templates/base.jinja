@@ -58,6 +58,10 @@
       {% endfor %}
     {% endif %}
   {% endwith %}
-  {% block content %}
-  {% endblock content %}
+  <div class="app-container">
+    <div class="outline">
+      {% block content %}
+      {% endblock content %}
+    </div>
+  </div>
 </body>

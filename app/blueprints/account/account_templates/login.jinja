@@ -1,34 +1,32 @@
 {% extends "base.jinja" %}
 {% block title %}
-  Sign In
+  Log In
 {% endblock title %}
 {% block content %}
-  <div class="input-container">
-    <div>
-      <div class="form-error">
-        {% if form.userName.errors %}
-          {% for error in form.userName.errors %}{{ error }}{% endfor %}
-        {% elif form.password.errors %}
-          {% for error in form.password.errors %}{{ error }}{% endfor %}
-        {% endif %}
-      </div>
-      <form method="post" class="input-form">
-        {{ form.hidden_tag() }}
-        <div class="input-wrapper">
-          <div class="input-label">
-            {{ form.userName.label }}
-            {{ form.password.label }}
-          </div>
-          <div class="input-field-container">
-            {{ form.userName(class_="field") }}
-            {{ form.password(class_="field") }}
-          </div>
-        </div>
-        <div class="btn-wrapper">{{ form.loginBtn(class_="btn") }}</div>
-      </form>
-      <form method="post">
-        <div class="btn-wrapper">{{ form.signupBtn(class_="btn") }}</div>
-      </form>
-    </div>
+  <div class="form-error">
+    {% if form.userName.errors %}
+      {% for error in form.userName.errors %}{{ error }}{% endfor %}
+    {% elif form.password.errors %}
+      {% for error in form.password.errors %}{{ error }}{% endfor %}
+    {% endif %}
   </div>
+  <form method="post" class="input-form">
+    {{ form.hidden_tag() }}
+    <div class="input-wrapper">
+      <div class="input-label">
+        {{ form.userName.label }}
+        {{ form.password.label }}
+      </div>
+      <div class="input-field-container">
+        {{ form.userName(class_="field") }}
+        {{ form.password(class_="field") }}
+      </div>
+    </div>
+    <div class="input-form-wrapper">
+      {{ form.loginBtn(class_="btn") }}
+    </form>
+    <form method="post">
+      {{ form.signupBtn(class_="btn") }}
+    </div>
+  </form>
 {% endblock content %}

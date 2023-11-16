@@ -1,45 +1,41 @@
 {% extends "base.jinja" %}
 {% block title %}
-  Pokedex
+  Favorite
 {% endblock title %}
 {% block content %}
-  <div class="app-container">
-    <div>
-      <div class="form-error">
-        {% if form.pokedexInput.errors %}
-          {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
-        {% endif %}
+  <div class="form-error">
+    {% if form.pokedexInput.errors %}
+      {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
+    {% endif %}
+  </div>
+  <div class="content-wrapper">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="pokedex-wrapper">
+        {{ form.pokedexInput.label(for="pokemonID") }}
+        <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
       </div>
-      <div class="content-wrapper">
-        <form method="post">
-          {{ form.hidden_tag() }}
-          <div class="pokedex-wrapper">
-            {{ form.pokedexInput.label(for="pokemonID") }}
-            <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
-          </div>
-        </form>
-        {% if connectErrorCode %}
-          {{ connectErrorCode }}
-        {% elif unownMessage %}
-          <div class="error">{{ unownMessage }}</div>
-        {% elif spriteURL %}
-          <div class="favorite-container">
-            <div>{{ name }}</div>
-            <div>
-              <img src="{{ spriteURL }}" alt="" height="" width="" class="sprite">
-              <img src="{{ shinySpriteURL }}" alt="" height="" width="" class="sprite">
-            </div>
-            <div class="favorite-btn-container">
-              <form method="post">
-                {{ form.favoritePkmnBtn(class="btn") }}
-              </form>
-              <form method="post">
-                {{ form.favoriteShinyPkmnBtn(class="btn") }}
-              </form>
-            </div>
-          </div>
-        {% endif %}
+    </form>
+    {% if connectErrorCode %}
+      {{ connectErrorCode }}
+    {% elif unownMessage %}
+      <div class="error">{{ unownMessage }}</div>
+    {% elif spriteURL %}
+      <div class="favorite-container">
+        <div>{{ name }}</div>
+        <div>
+          <img src="{{ spriteURL }}" alt="" height="" width="" class="sprite">
+          <img src="{{ shinySpriteURL }}" alt="" height="" width="" class="sprite">
+        </div>
+        <div class="favorite-btn-container">
+          <form method="post">
+            {{ form.favoritePkmnBtn(class="btn") }}
+          </form>
+          <form method="post">
+            {{ form.favoriteShinyPkmnBtn(class="btn") }}
+          </form>
+        </div>
       </div>
-    </div>
+    {% endif %}
   </div>
 {% endblock content %}

@@ -17,17 +17,27 @@ body {
   font-family: "orange-kid", sans-serif;
   background-color: rgb(28, 27, 27);
   color: white;
-  font-size: 60px;
+  font-size: 2.5vw;
 }
 
 form {
   margin: 0;
 }
 
+nav {
+  position: relative;
+  height: 0vh;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+}
+
 .nav-bar {
   display: flex;
-  position: absolute;
-  top: -5%;
+  margin: 0;
+  padding: 0;
+  height: 2vh;
+  margin-left: 1vw;
 }
 
 .nav-bar li {
@@ -36,7 +46,7 @@ form {
 }
 
 .nav-bar li a {
-  font-size: 30px;
+  font-size: 1.5vw;
   text-decoration: none;
   color: var(--primary-link-color);
 }
@@ -49,12 +59,8 @@ form {
   display: flex;
 }
 
-.masterball-flipped {
-  transform: scaleX(-1);
-}
-
 .sprite {
-  height: 290px;
+  height: 13vw;
   width: auto;
 }
 
@@ -68,16 +74,20 @@ form {
 .pokemon-data {
   margin: 20px;
   padding: 20px;
-  font-size: 50px;
+  font-size: 4vh;
 }
 
 .pokemon-data-container {
   display: flex;
+  /* width: auto;
+  align-items: center;
+  justify-content: center; */
 }
 
 .content-wrapper {
   /* border: 1px solid red; */
   border-radius: 10px;
+  max-height: 90vh;
 }
 
 .data-label {
@@ -96,15 +106,7 @@ form {
   height: 100%;
 }
 
-.input-container {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  align-items: center;
-  height: 100%;
-}
-
-.input-container input:focus {
+.app-container input:focus {
   outline: none;
 }
 
@@ -181,10 +183,12 @@ form {
 }
 
 .pokedex-wrapper {
+  opacity: 0;
   display: flex;
   flex-direction: column;
   text-align: center;
   align-items: center;
+  animation: slide-in-fade-in-from-top 1s ease-in-out forwards;
 }
 
 .input-label {
@@ -215,13 +219,6 @@ form {
   text-align: right;
 }
 
-.input-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
 .btn {
   height: 60px;
   width: 250px;
@@ -249,14 +246,6 @@ form {
   100% {
     transform: translateX(0);
   }
-}
-
-.btn-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
 }
 
 .btn:hover {
@@ -314,6 +303,11 @@ form {
 
 .favorite-container {
   text-align: center;
+}
+
+.favorite-sprite {
+  height: 5vw;
+  width: auto;
 }
 
 .favorite-btn-container {
@@ -456,4 +450,18 @@ form {
 .delay-show6 {
   opacity: 0;
   animation: fadeIn 1.5s ease-in-out 1.2s forwards;
+}
+
+.delete-pkmn-btn {
+  opacity: 0;
+  animation: slide-in-fade-in-from-bottom 1s forwards;
+  animation-iteration-count: 1;
+}
+
+.delete-pkmn-btn:hover {
+  opacity: 1;
+}
+
+.hidden {
+  opacity: 0;
 }

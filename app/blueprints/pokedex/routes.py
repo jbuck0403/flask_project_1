@@ -134,8 +134,9 @@ def team():
     pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pkmnTeam]
     if request.method == 'POST':
         if 'deletePkmnBtn' in request.form:
+            
             index = int(request.form.get('deletePkmnBtn').strip()) - 1
-
+            print(index)
             try:
                 pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.id == pkmnTeam[index].id).first()
                 db.session.delete(pkmnToDelete)
