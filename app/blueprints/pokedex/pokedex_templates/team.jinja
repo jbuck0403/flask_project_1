@@ -1,22 +1,32 @@
 {% extends "base.jinja" %}
 {% block content %}
-  <form method="post">
-    <div class="app-container">
-      <div>
-        <div class="content-wrapper">
-          <div class="team-container">
-            {% for pkmn in pkmnTeam %}
-              {% if sendingToBox %}
-                <div class="sprite-and-btn">
-                  <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
-                  {{ form.sendToBoxBtn(class="btn", value=loop.index) }}
-                </div>
-              {% else %}
+  <div class="app-container">
+    <div>
+      <div class="content-wrapper">
+        <div class="team-container">
+          {% for pkmn in pkmnTeam %}
+            {% if sendingToBox %}
+              <div class="sprite-and-btn">
                 <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
+                <form method="post">
+                  {{ form.deletePkmnBtn(class="btn", value=loop.index) }}
+                </form>
+              </div>
+            {% else %}
+              {% if instantSprite %}
+                <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
+              {% else %}
+                <img src="{{ pkmn }}"
+                     alt=""
+                     height=""
+                     width=""
+                     class="sprite delay-show{{ loop.index }}">
               {% endif %}
-            {% endfor %}
-          </div>
+            {% endif %}
+          {% endfor %}
         </div>
+      </div>
+      <form method="post">
         <div class="input-form-wrapper">
           {% if sendingToBox %}
             {{ form.cancelBtn(class="btn delete-btn") }}
@@ -24,7 +34,7 @@
             {{ form.sendToBoxBtn(class="btn delete-btn") }}
           {% endif %}
         </div>
-      </div>
+      </form>
     </div>
-  </form>
+  </div>
 {% endblock content %}

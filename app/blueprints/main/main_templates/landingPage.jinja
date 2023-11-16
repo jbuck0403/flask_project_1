@@ -1,10 +1,6 @@
 {% extends "base.jinja" %}
 {% block content %}
   <div class="app-container">
-    <div>
-      <div class="unown-word">
-        {% for sprite in unownWord %}<img src="{{ sprite }}" alt="" height="" width="" class="sprite">{% endfor %}
-      </div>
-    </div>
+    <div>{{ unownMessage }}</div>
   </div>
 {% endblock content %}

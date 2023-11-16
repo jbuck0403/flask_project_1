@@ -10,6 +10,7 @@ class PokedexInputForm(FlaskForm):
     favoriteShinyPkmnBtn = SubmitField('Choose Shiny')
     catchPkmnBtn = SubmitField('Throw a Poké Ball')
     sendToBoxBtn = SubmitField('Send To Box')
+    deletePkmnBtn = SubmitField('Delete')
     cancelBtn = SubmitField('Cancel')
 
     def returnTeam(self, numInTeam=False):

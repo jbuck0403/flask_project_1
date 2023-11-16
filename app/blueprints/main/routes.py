@@ -7,4 +7,4 @@ from . import main
 def landingPage():
     pokedex = Pokedex()
 
-    return render_template('landingPage.jinja', unownWord=pokedex.unownSpeller("welcome"))
+    return pokedex.unownMessage(None, "welcome",'landingPage.jinja')

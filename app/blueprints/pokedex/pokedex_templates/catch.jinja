@@ -20,13 +20,8 @@
         </form>
         {% if connectErrorCode %}
           {{ connectErrorCode }}
-        {% elif unownWord %}
-          <div class="error">
-            <div>
-              {% for sprite in unownWord %}<img src="{{ sprite }}" alt="" height="" width="" class="sprite">{% endfor %}
-            </div>
-            <div>Couldn't find that one...</div>
-          </div>
+        {% elif unownMessage %}
+          <div class="error">{{ unownMessage }}</div>
         {% elif spriteURL %}
           <div class="favorite-container">
             <div>A wild {{ name }} appears!</div>

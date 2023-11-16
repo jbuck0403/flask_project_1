@@ -18,20 +18,8 @@
             <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
           </div>
         </form>
-        {% if unownWord %}
-          <div class="error">
-            <div>
-              {% for sprite in unownWord %}
-                <img src="{{ sprite }}"
-                     alt=""
-                     height=""
-                     width=""
-                     class="sprite"
-                     loading="">
-              {% endfor %}
-            </div>
-            <div>Couldn't find that one...</div>
-          </div>
+        {% if unownMessage %}
+          <div class="error">{{ unownMessage }}</div>
         {% elif pokemonInfoDict %}
           <div class="pokemon-data-container">
             {% if spriteURL %}

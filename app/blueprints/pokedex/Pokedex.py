@@ -20,10 +20,32 @@ class Pokedex():
 
         return unownWord
     
-    def unownErrorMessage(self, form, *args):
-        unownWord = self.unownSpeller()
-        
-        return render_template(*args, form=form, unownWord=unownWord)
+    def unownMessage(self, form, wordToSpell=True, *args):
+        def delayModifier(arrLen = 5, idx=False, lastRand=False):
+            if idx:
+                return "-top" if idx % 2 == 0 else "-bottom"
+            elif wordToSpell == 'welcome':
+                rand = lastRand
+                while rand == lastRand:
+                    rand = random.randint(1,arrLen)
+                return rand
+            else:
+                return ''
+
+        unownWord = self.unownSpeller(wordToSpell)
+
+        errorMessage = "Couldn't find that one..."
+        htmlContent = '<div>'
+        lastRand = 0
+        for idx, sprite in enumerate(unownWord):
+            rand = delayModifier(lastRand=lastRand)
+            htmlContent += f'<img src="{sprite}" class="sprite delay-show{rand}">'
+            lastRand = rand
+        htmlContent += '</div>'
+        if wordToSpell != 'welcome':
+            htmlContent += f'<div class="animated-text">{errorMessage}</div>'
+
+        return render_template(*args, form=form, unownMessage=htmlContent)
 
     def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False, team=False):
         def populatePkmnTableFromAPI(data):

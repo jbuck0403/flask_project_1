@@ -233,6 +233,24 @@ form {
   margin-top: 10px;
 }
 
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1px) rotate(1deg);
+  }
+  50% {
+    transform: translateX(1px) rotate(-1deg);
+  }
+  75% {
+    transform: translateX(-1px) rotate(1deg);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .btn-wrapper {
   width: 100%;
   display: flex;
@@ -244,6 +262,7 @@ form {
 .btn:hover {
   color: rgb(249, 46, 46);
   background-color: white;
+  animation: shake 0.2s ease-in-out;
 }
 
 .input-form {
@@ -356,10 +375,85 @@ form {
   animation: fadeIn 0.05s ease-in-out 10s forwards, disappear 5s 10s forwards;
 }
 
-.hidden {
+.delay-show {
   opacity: 0;
+  animation: fadeIn 1.2s ease-in-out 0.2s forwards;
 }
 
-.visible {
-  display: 1;
+.animated-text {
+  opacity: 0;
+  animation: slide-in-fade-in 1s ease-in-out 0.2s forwards;
+}
+
+@keyframes slide-in-fade-in {
+  0% {
+    transform: translateX(-2.5%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.delay-show-top {
+  opacity: 0;
+  animation: slide-in-fade-in-from-top 1.5s ease-in-out 0.2s forwards;
+}
+
+.delay-show-bottom {
+  opacity: 0;
+  animation: slide-in-fade-in-from-bottom 1s ease-in-out 0.2s forwards;
+}
+
+@keyframes slide-in-fade-in-from-top {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-fade-in-from-bottom {
+  0% {
+    transform: translateY(10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.delay-show1 {
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 0.2s forwards;
+}
+
+.delay-show2 {
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 0.4s forwards;
+}
+
+.delay-show3 {
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 0.6s forwards;
+}
+
+.delay-show4 {
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 0.8s forwards;
+}
+
+.delay-show5 {
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 1s forwards;
+}
+
+.delay-show6 {
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out 1.2s forwards;
 }

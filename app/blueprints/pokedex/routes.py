@@ -1,4 +1,4 @@
-from flask import request, render_template, flash, session
+from flask import request, render_template, flash, session, redirect, url_for
 import requests
 from .forms import PokedexInputForm
 from app.models import db, PkmnTeam
@@ -20,7 +20,8 @@ def pokedex():
 
         pokemonData = pokedex.returnPokemonData(form)
         if isinstance(pokemonData, int):
-            return pokedex.unownErrorMessage(form, 'pokedex.jinja')
+            form.pokedexInput.data = ""
+            return pokedex.unownMessage(form, True, 'pokedex.jinja')
         else:
             pokemonInfoDict, spriteURL, spriteShinyURL = pokemonData
 
@@ -68,7 +69,7 @@ def favorite():
                 name, pokedexID, sprite, shinySprite = pokemonData
             else:
                 # sprite = pokemonData
-                return pokedex.unownErrorMessage(form, "favorite.jinja")
+                return pokedex.unownMessage(form, True, "favorite.jinja")
             
             session['pokedexID'] = pokedexID
             return render_template("favorite.jinja", form=form, spriteURL=sprite, shinySpriteURL=shinySprite, name=name)
@@ -88,6 +89,7 @@ def catch():
             shiny = session.pop('shiny')
             name = session.pop('name')
             trainerPkmn = [pkmn.pkmnID for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
+           
             if form.returnTeam(numInTeam=True) < 6 and not pokedexID in trainerPkmn:
             
                 try:
@@ -110,9 +112,10 @@ def catch():
                 name, pokedexID, sprite, shiny = pokemonData
             else:
                 sprite = pokemonData
+
             form.pokedexInput.data = ""
             if isinstance(sprite, int):
-                return pokedex.unownErrorMessage(form, "catch.jinja")
+                return pokedex.unownMessage(form, True, "catch.jinja")
             
             session['pokedexID'] = pokedexID
             session['shiny'] = shiny
@@ -130,23 +133,24 @@ def team():
     pkmnTeam = form.returnTeam()
     pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pkmnTeam]
     if request.method == 'POST':
-        if 'sendToBoxBtn' in request.form:
-            
-            if request.form.get('sendToBoxBtn').strip().isdigit():
-            
-                index = int(request.form.get('sendToBoxBtn').strip()) - 1
+        if 'deletePkmnBtn' in request.form:
+            index = int(request.form.get('deletePkmnBtn').strip()) - 1
 
-                try:
-                    pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.id == pkmnTeam[index].id).first()
-                    db.session.delete(pkmnToDelete)
-                    db.session.commit()
-                    flash("Successfully sent Pokémon to Box!", "success")
-                    pkmnTeam = form.returnTeam()
-                    pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pkmnTeam]
-                except:
-                    db.session.rollback()
-                    flash("Error sending Pokémon to Box...", "error")
+            try:
+                pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.id == pkmnTeam[index].id).first()
+                db.session.delete(pkmnToDelete)
+                db.session.commit()
+                flash("Successfully sent Pokémon to Box!", "success")
+                pkmnTeam = form.returnTeam()
+                pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pkmnTeam]
+            except:
+                db.session.rollback()
+                flash("Error sending Pokémon to Box...", "error")
 
-            return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, sendingToBox=True)
+        elif 'cancelBtn' in request.form:
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, instantSprite=True)
+        
 
+        return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, sendingToBox=True)
+   
     return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS)
