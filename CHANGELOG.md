@@ -44,3 +44,8 @@ CHANGELOG 9
 
 - added shake animation to buttons
 - smoothed choppy sprite loading with fade animations
+
+CHANGELOG 10
+
+- fixed error adding pokemon with no base exp to db
+- fixed error where Pokedex was not displaying second type

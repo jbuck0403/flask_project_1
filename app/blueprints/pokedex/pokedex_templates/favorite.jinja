@@ -29,19 +29,23 @@
                height=""
                width=""
                class="sprite delay-show-left">
-          <img src="{{ shinySpriteURL }}"
-               alt=""
-               height=""
-               width=""
-               class="sprite delay-show-right">
+          {% if spriteShinyURL %}
+            <img src="{{ shinySpriteURL }}"
+                 alt=""
+                 height=""
+                 width=""
+                 class="sprite delay-show-right">
+          {% endif %}
         </div>
         <div class="favorite-btn-container">
           <form method="post">
             {{ form.favoritePkmnBtn(class="btn delay-show-bottom") }}
           </form>
-          <form method="post">
-            {{ form.favoriteShinyPkmnBtn(class="btn delay-show-bottom") }}
-          </form>
+          {% if spriteShinyURL %}
+            <form method="post">
+              {{ form.favoriteShinyPkmnBtn(class="btn delay-show-bottom") }}
+            </form>
+          {% endif %}
         </div>
       </div>
     {% endif %}

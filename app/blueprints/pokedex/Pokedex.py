@@ -136,8 +136,8 @@ class Pokedex():
         if favorite:
             return pokemon.name, pokemon.id, pokemon.sprite, pokemon.spriteShiny
         elif catch:
-            shinyChance = random.randint(0,10)
-            return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 else pokemon.sprite, True if shinyChance == 5 else False
+            shinyChance = random.randint(1,10)
+            return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 and pokemon.spriteShiny != None else pokemon.sprite, True if shinyChance == 5 and pokemon.spriteShiny != None else False
         elif favoriteSprite or team:
             if shiny:
                 return pokemon.spriteShiny

@@ -46,7 +46,7 @@ def favorite():
     form = PokedexInputForm()
     pokedex = Pokedex(form)
     form.pokedexInput.label.text = "Choose Favorite Pokémon"
-
+    
     if request.method == "POST":
         if "favoritePkmnBtn" in request.form or "favoriteShinyPkmnBtn" in request.form:
             pokedexID = session.pop('pokedexID', current_user.userName)
