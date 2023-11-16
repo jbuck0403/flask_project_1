@@ -37,7 +37,7 @@ class Pkmn(db.Model):
     firstAbility = db.Column(db.String, nullable=False)
     secondAbility = db.Column(db.String, nullable=True)
     hiddenAbility = db.Column(db.String, nullable=True)
-    baseEXP = db.Column(db.Integer, nullable=False)
+    baseEXP = db.Column(db.Integer, nullable=True)
     baseHP = db.Column(db.Integer, nullable=False)
     baseAtk = db.Column(db.Integer, nullable=False)
     baseDef = db.Column(db.Integer, nullable=False)

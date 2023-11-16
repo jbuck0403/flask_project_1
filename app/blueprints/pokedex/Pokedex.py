@@ -59,7 +59,7 @@ class Pokedex():
                 hp, atk, defense, spatk, spdef, spd = [stat['base_stat'] for stat in data['stats']]
 
                 return hp, atk, defense, spatk, spdef, spd
-                
+            
             spriteURL = data['sprites']['front_default']
             spriteShinyURL = data['sprites']['front_shiny']
             pokedexID = data['id']
@@ -91,7 +91,7 @@ class Pokedex():
 
         def returnPokemonInfoDict(pokemon):
             pkmnInfo = [pokemon.name, pokemon.id, pokemon.firstType, pokemon.secondType, pokemon.firstAbility, pokemon.secondAbility, pokemon.hiddenAbility, pokemon.baseEXP, pokemon.baseHP, pokemon.baseAtk, pokemon.baseDef, pokemon.baseSpAtk, pokemon.baseSpDef, pokemon.baseSpd]
-            labels = ["Name:", "ID:", "Type:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]
+            labels = ["Name:", "ID:", "Type 1:", "Type 2:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]
             
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
