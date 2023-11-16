@@ -76,6 +76,19 @@ def favorite():
 
     return render_template("favorite.jinja", form=form)
 
+@pokedexBP.route('/remove_favorite')
+@login_required
+def remove_favorite():
+    try:
+        current_user.favoritePkmn = None
+        db.session.commit()
+        flash("Favorite set to default", "success")
+    except:
+        db.session.rollback()
+        flash("Error setting default favorite...", "error")
+    
+    return redirect(url_for('pokedexBP.favorite'))
+
 @pokedexBP.route('/catch', methods=['GET','POST'])
 @login_required
 def catch():

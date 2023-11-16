@@ -400,6 +400,16 @@ nav {
   animation: slide-in-fade-in-from-bottom 1s ease-in-out 0.2s forwards;
 }
 
+.delay-show-left {
+  opacity: 0;
+  animation: slide-in-fade-in-from-left 1s ease-in-out 0.2s forwards;
+}
+
+.delay-show-right {
+  opacity: 0;
+  animation: slide-in-fade-in-from-right 1s ease-in-out 0.2s forwards;
+}
+
 @keyframes slide-in-fade-in-from-top {
   0% {
     transform: translateY(-10%);
@@ -414,6 +424,28 @@ nav {
 @keyframes slide-in-fade-in-from-bottom {
   0% {
     transform: translateY(10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-fade-in-from-left {
+  0% {
+    transform: translateX(-10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-fade-in-from-right {
+  0% {
+    transform: translateX(10%);
     opacity: 0;
   }
   100% {
@@ -452,16 +484,17 @@ nav {
   animation: fadeIn 1.5s ease-in-out 1.2s forwards;
 }
 
-.delete-pkmn-btn {
-  opacity: 0;
-  animation: slide-in-fade-in-from-bottom 1s forwards;
-  animation-iteration-count: 1;
-}
-
-.delete-pkmn-btn:hover {
-  opacity: 1;
-}
-
 .hidden {
   opacity: 0;
+}
+
+.link-btn {
+  text-align: center;
+  text-decoration: none;
+  padding-top: 10px;
+  box-shadow: -1px -1px 2px gray;
+}
+
+.delay-show-bottom:hover {
+  opacity: 1;
 }

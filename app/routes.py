@@ -1,6 +1,7 @@
 from app import app
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.blueprints.pokedex.Pokedex import Pokedex
+
 
 @app.context_processor
 def injectFavoriteSprite():
@@ -11,5 +12,5 @@ def injectFavoriteSprite():
 
         favoriteSprite = pokedex.returnPokemonData(pkmnID, favoriteSprite=True, shiny=spriteType)
     else:
-        favoriteSprite = None
+        favoriteSprite = "./static/masterball_transparent.png"
     return dict(favoriteSprite=favoriteSprite)

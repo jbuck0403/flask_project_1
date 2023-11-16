@@ -22,10 +22,18 @@
       <div class="error">{{ unownMessage }}</div>
     {% elif spriteURL %}
       <div class="favorite-container">
-        <div>{{ name }}</div>
+        <div class="delay-show">{{ name }}</div>
         <div>
-          <img src="{{ spriteURL }}" alt="" height="" width="" class="sprite">
-          <img src="{{ shinySpriteURL }}" alt="" height="" width="" class="sprite">
+          <img src="{{ spriteURL }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite delay-show-left">
+          <img src="{{ shinySpriteURL }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite delay-show-right">
         </div>
         <div class="favorite-btn-container">
           <form method="post">
@@ -35,6 +43,12 @@
             {{ form.favoriteShinyPkmnBtn(class="btn") }}
           </form>
         </div>
+      </div>
+    {% endif %}
+    {% if current_user.favoritePkmn != None %}
+      <div class="input-form-wrapper">
+        <a href='{{ url_for("pokedexBP.remove_favorite") }}'
+           class="btn delete-btn link-btn delay-show-bottom">Set Default</a>
       </div>
     {% endif %}
   </div>

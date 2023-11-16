@@ -22,12 +22,16 @@
       <div class="error">{{ unownMessage }}</div>
     {% elif spriteURL %}
       <div class="favorite-container">
-        <div>A wild {{ name }} appears!</div>
+        <div class="delay-show">A wild {{ name }} appears!</div>
         <div>
-          <img src="{{ spriteURL }}" alt="" height="" width="" class="sprite">
+          <img src="{{ spriteURL }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite delay-show-bottom">
         </div>
         <form method="post">
-          {{ form.catchPkmnBtn(class="btn") }}
+          {{ form.catchPkmnBtn(class="btn delay-show-bottom") }}
         </form>
       </div>
     {% endif %}

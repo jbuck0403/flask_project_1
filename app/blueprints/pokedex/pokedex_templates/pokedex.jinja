@@ -22,11 +22,21 @@
       <div class="pokemon-data-container">
         {% if spriteURL %}
           <div class="sprite-container">
-            <img src="{{ spriteURL }}" alt="" class="sprite" height="" width="">
-            {% if spriteShinyURL %}<img src="{{ spriteShinyURL }}" alt="" class="sprite" height="" width="">{% endif %}
+            <img src="{{ spriteURL }}"
+                 alt=""
+                 class="sprite delay-show-left"
+                 height=""
+                 width="">
+            {% if spriteShinyURL %}
+              <img src="{{ spriteShinyURL }}"
+                   alt=""
+                   class="sprite delay-show-right"
+                   height=""
+                   width="">
+            {% endif %}
           </div>
         {% endif %}
-        <table class="pokemon-data">
+        <table class="pokemon-data delay-show">
           {% for dataLabel, data in pokemonInfoDict %}
             <tr>
               <td class="data-label">{{ dataLabel }}</td>
