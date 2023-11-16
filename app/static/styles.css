@@ -378,6 +378,7 @@ nav {
 .animated-text {
   opacity: 0;
   animation: slide-in-fade-in 1s ease-in-out 0.2s forwards;
+  color: white;
 }
 
 @keyframes slide-in-fade-in {
