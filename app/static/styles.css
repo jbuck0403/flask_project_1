@@ -355,3 +355,11 @@ form {
   opacity: 0;
   animation: fadeIn 0.05s ease-in-out 10s forwards, disappear 5s 10s forwards;
 }
+
+.hidden {
+  opacity: 0;
+}
+
+.visible {
+  display: 1;
+}

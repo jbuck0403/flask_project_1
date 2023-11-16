@@ -25,32 +25,6 @@ class Pokedex():
         
         return render_template(*args, form=form, unownWord=unownWord)
 
-    # def returnSpriteURL(self, pkmn=10027, pkmnType="pokemon-form", shiny=False):
-    #     """returns a pokemon sprite from id or name (accepts string or int)
-        
-    #     default returns a pokemon-form, pkmnType='pokemon' to return a regular pokemon"""
-    #     url = f"https://pokeapi.co/api/v2/{pkmnType}/{pkmn}"
-    #     response = requests.get(url)
-
-    #     if not response.ok:
-    #         return response.status_code
-    #     else:
-    #         data = response.json()
-    #         return data["sprites"][f"front_{'shiny' if shiny else 'default'}"]
-
-    # def renderSprite(self, errorCode, unownWord=False, *args):
-    
-    #     sprite = self.returnSpriteURL()
-
-    #     if len(sprite) == 3:
-    #         return self.render_pokedex(connectErrorCode=sprite)
-
-    #     else:
-    #         if unownWord:
-    #             return self.render_pokedex(errorCode=errorCode, unownWord=self.unownSpeller(unownWord))
-    #         else:
-    #             return self.render_pokedex(errorCode=errorCode, sprite=sprite)
-
     def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False, team=False):
         def populatePkmnTableFromAPI(data):
             def unpackTuple(arr):
