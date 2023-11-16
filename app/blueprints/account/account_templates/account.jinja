@@ -28,17 +28,17 @@
       {% endif %}
     {% endif %}
   </div>
-  <div class="welcome-wrapper">
+  <div class="welcome-wrapper delay-show">
     {% if requestConfirmLogout %}
-      <div>Are you sure?</div>
+      <div class="delay-show-top">Are you sure?</div>
     {% elif requestUserNameChange %}
-      <div>Tired of {{ current_user.userName }}?</div>
+      <div class="delay-show-top">Tired of {{ current_user.userName }}?</div>
     {% elif requestPasswordChange %}
-      <div>This one too long?</div>
+      <div class="delay-show-top">This one too long?</div>
     {% elif requestDeleteAccount %}
-      <div>This cannot be undone</div>
+      <div class="delay-show-top">This cannot be undone</div>
     {% else %}
-      <div>Hello, {{ current_user.userName }}!</div>
+      <div class="delay-show-top">Hello, {{ current_user.userName }}!</div>
     {% endif %}
     <div class="input-form-wrapper">
       {% if requestUserNameChange %}
@@ -111,7 +111,7 @@
           <div class="input-form-wrapper">
             {{ form.changeUserNameBtn(class_="btn top-btn") }}
             {{ form.changePasswordBtn(class_="btn") }}
-            {{ form.deleteAccountBtn(class_="btn delete-btn") }}
+            {{ form.deleteAccountBtn(class_="btn delete-btn delay-show-bottom") }}
             {{ form.logoutBtn(class_="btn logout-btn") }}
           </div>
         </form>
