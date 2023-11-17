@@ -3,7 +3,7 @@
   Log In
 {% endblock title %}
 {% block content %}
-  <div class="form-error">
+  <div class="form-error delay-show-top">
     {% if form.userName.errors %}
       {% for error in form.userName.errors %}{{ error }}{% endfor %}
     {% elif form.password.errors %}
@@ -12,7 +12,7 @@
   </div>
   <form method="post" class="input-form">
     {{ form.hidden_tag() }}
-    <div class="input-wrapper">
+    <div class="input-wrapper delay-show-act">
       <div class="input-label">
         {{ form.userName.label }}
         {{ form.password.label }}
@@ -22,7 +22,7 @@
         {{ form.password(class_="field") }}
       </div>
     </div>
-    <div class="input-form-wrapper">
+    <div class="input-form-wrapper delay-show">
       {{ form.loginBtn(class_="btn") }}
     </form>
     <form method="post">

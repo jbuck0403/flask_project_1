@@ -3,7 +3,7 @@
   Create Account
 {% endblock title %}
 {% block content %}
-  <div class="form-error">
+  <div class="form-error delay-show-top">
     {% if form.confirmPassword.errors %}
       {% for error in form.confirmPassword.errors %}{{ error }}{% endfor %}
     {% elif form.userName.errors %}
@@ -14,7 +14,7 @@
   </div>
   <form method="post" class="input-form">
     {{ form.hidden_tag() }}
-    <div class="input-wrapper">
+    <div class="input-wrapper delay-show-act">
       <div class="input-label">
         {{ form.userName.label }}
         {{ form.password.label }}
@@ -26,6 +26,6 @@
         {{ form.confirmPassword(class="field") }}
       </div>
     </div>
-    <div class="input-form-wrapper">{{ form.createAccountBtn(class="btn create-account-btn") }}</div>
+    <div class="input-form-wrapper delay-show">{{ form.createAccountBtn(class="btn create-account-btn") }}</div>
   </form>
 {% endblock content %}
