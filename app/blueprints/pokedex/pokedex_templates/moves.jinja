@@ -1,0 +1,34 @@
+{% extends "base.jinja" %}
+{% block title %}
+  Moves
+{% endblock title %}
+{% block content %}
+  <div class="form-error delay-show-bottom">
+    {% if form.pokedexInput.errors %}
+      {% for error in form.pokedexInput.errors %}{{ error }}{% endfor %}
+    {% endif %}
+  </div>
+  <div class="content-wrapper">
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div class="pokedex-wrapper">
+        {{ form.pokedexInput.label(for="pokemonID") }}
+        <div class="pokedex-input-field-container">{{ form.pokedexInput(class="field pokedex-field", id="pokemonID") }}</div>
+      </div>
+    </form>
+    {% if unownMessage %}
+      <div class="error">{{ unownMessage }}</div>
+    {% elif moveData %}
+      <div class="pokemon-data-container">
+        <table class="pokemon-data delay-show">
+          {% for dataLabel, data in moveData %}
+            <tr>
+              <td class="data-label">{{ dataLabel }}:</td>
+              <td class="data">{{ data }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endif %}
+  </div>
+{% endblock content %}

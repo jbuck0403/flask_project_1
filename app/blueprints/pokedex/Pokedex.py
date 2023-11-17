@@ -1,6 +1,6 @@
 import requests, random
 from flask import render_template, flash
-from app.models import Pkmn, UnownLetters, db
+from app.models import Pkmn, UnownLetters, db, PkmnMoves
 from sqlalchemy import func
 
 class Pokedex():
@@ -46,6 +46,90 @@ class Pokedex():
             htmlContent += f'<div class="animated-text">{errorMessage}</div>'
 
         return render_template(*args, form=form, unownMessage=htmlContent)
+
+    def titlePokemon(self, name):
+            name = name.lower().strip()
+            if name.isdigit():
+                return name
+            else:
+                splitName = name.split('-')
+                return '-'.join([split.title() for split in splitName])
+
+    def addMoveToDB(self, data):
+        move = PkmnMoves(
+                        data['id'],
+                        moveName := self.titlePokemon(data['name']),
+                        data['power'],
+                        data['type']['name'].title(),
+                        data['damage_class']['name'].title(),
+                        data['accuracy'],
+                        data['priority'],
+                        data['pp'],
+                        data['flavor_text_entries'][0]['flavor_text']
+                    )
+        try:
+            db.session.add(move)
+            db.session.commit()
+            flash(f"Successfully added {moveName} to DataBase", "success")
+            return move
+        except:
+            db.session.rollback()
+            flash(f"Error adding {moveName} to DataBase", "error")
+            return False
+
+    def returnPokemonMove(self, form):
+        def createMoveDict(data):
+            def fromAPI(data):
+                if move := self.addMoveToDB(data):
+                    return fromDB(move)
+                else:
+                    return False
+
+            def fromDB(data):
+                return [
+                        data.id,
+                        data.name,
+                        data.power,
+                        data.type,
+                        data.damageClass,
+                        data.accuracy,
+                        data.priority,
+                        data.pp,
+                        data.flavorText
+                    ]
+
+            labels = ["ID",'Name','Power','Type','Damage Class','Accuracy','Priority','PP','Flavor Text']
+            
+            if isinstance(data, PkmnMoves):
+                moveInfo = fromDB(data)
+            else:
+                moveInfo = fromAPI(data)
+            
+            if moveInfo:
+                return dict(zip(labels, moveInfo))
+            else: return False
+
+        moveToCheck = form.pokedexInput.data.strip().lower() # get user input from form
+        
+        if moveToCheck.isdigit(): # if an id was entered
+            identifier = PkmnMoves.id
+        else: # if a name was entered
+            identifier = PkmnMoves.name
+
+        # check if user input exists in db
+        validMove= PkmnMoves.query.filter(identifier == moveToCheck).first()
+        
+        if validMove: # if user input exists in db
+            return createMoveDict(validMove) # return dict
+        else: # if user input does not exist in db
+            url = f"https://pokeapi.co/api/v2/move/{moveToCheck}/" # generate api url
+            response = requests.get(url)
+
+            if not response.ok: # if api call returned an error
+                return response.status_code # return the error
+            
+            data = response.json() # process the json
+            return createMoveDict(data) # process the json and add to db, then return dict
 
     def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False, team=False):
         def populatePkmnTableFromAPI(data):
@@ -96,18 +180,11 @@ class Pokedex():
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
 
             return pokemonInfoDict, pokemon.sprite, pokemon.spriteShiny
-
-        def titlePokemon(name):
-            if name.isdigit():
-                return name
-            else:
-                splitName = name.split('-')
-                return '-'.join([split.title() for split in splitName])
             
         if favoriteSprite or team:
             id = str(form)
         else:
-            id = titlePokemon(form.pokedexInput.data.strip().lower())
+            id = self.titlePokemon(form.pokedexInput.data)
 
         if id.isdigit():
             identifier = Pkmn.id

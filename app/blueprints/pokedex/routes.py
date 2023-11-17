@@ -7,6 +7,26 @@ from .Pokedex import Pokedex
 from . import pokedexBP
 
 
+@pokedexBP.route('/moves', methods=['GET','POST'])
+def moves():
+    form = PokedexInputForm()
+    pokedex = Pokedex(form)
+
+    form.pokedexInput.label.text = "Search Move"
+
+    if request.method == "POST" and form.validate_on_submit():
+
+        moveData = pokedex.returnPokemonMove(form)
+        form.pokedexInput.data = ""
+        if isinstance(moveData, int):
+            return pokedex.unownMessage(form, True, 'moves.jinja')
+        else:
+            return render_template('moves.jinja', form=form, moveData=moveData.items())
+    
+    return render_template('moves.jinja', form=form)
+            
+
+
 @pokedexBP.route("/pokedex", methods=['GET', 'POST'])
 def pokedex():
     def render_pokedex(**kwargs):
@@ -168,3 +188,6 @@ def team():
         return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, sendingToBox=True)
    
     return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS)
+
+
+
