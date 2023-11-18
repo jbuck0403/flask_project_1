@@ -1,6 +1,6 @@
 import requests, random
 from flask import render_template, flash
-from app.models import Pkmn, UnownLetters, db, PkmnMoves
+from app.models import Pkmn, UnownLetters, db, PkmnMoves, statusMovesLearnableByPokemon, damageMovesLearnableByPokemon
 from sqlalchemy import func
 
 class Pokedex():
@@ -55,28 +55,121 @@ class Pokedex():
                 splitName = name.split('-')
                 return '-'.join([split.title() for split in splitName])
 
-    def addMoveToDB(self, data):
-        move = PkmnMoves(
-                        data['id'],
-                        moveName := self.titlePokemon(data['name']),
-                        data['power'],
-                        data['type']['name'].title(),
-                        data['damage_class']['name'].title(),
-                        data['accuracy'],
-                        data['priority'],
-                        data['pp'],
-                        data['flavor_text_entries'][0]['flavor_text']
-                    )
+
+    def populateMovesDB(self, data, pkmnObj):
+        def bulkAddMoves(movesToAdd):
+            def getAPIData(url):
+                response = requests.get(url)
+
+                if not response.ok: # if api call returned an error
+                    return response.status_code # return the error
+                
+                data = response.json() # process the json
+
+                return data
+            
+            lastMoveIdx = len(movesToAdd) - 1 # define the number of moves to add for flash message after successful commit
+            addedMoves = []
+        
+            for idx, url in enumerate(movesToAdd): # for every move to be added to the db
+                end = idx == lastMoveIdx
+                addedMoves.append(self.addMoveToDB(getAPIData(url), end, lastMoveIdx + 1)) # add the move to the db and return the associated move object
+
+            return addedMoves # return all recently added move objects
+        
+        
+        learnableMovesDict = {} # create empty dict to hold move name and api url
+        for move in data['moves']: # for every name/url pair
+            learnableMovesDict[move['move']['name'].lower()] = move['move']['url'] # populate the dict with move name as key and move api url as value
+            
+        learnableMoveObjs = []
+        for move in db.session.query(PkmnMoves).all(): # for every move currently inside the database
+            currentMove = move.name.lower()
+            if currentMove in list(learnableMovesDict.keys()): # if that move is in the dict of moves this pokemon can learn
+                learnableMoveObjs.append(move) # add that move object to the list
+                del learnableMovesDict[currentMove] # delete the name/url pair from the dict
+               
         try:
-            db.session.add(move)
+            addedMoveObjs = bulkAddMoves(list(learnableMovesDict.values())) # add all of the moves that are learnable by this pokemon that aren't current in the db
+        except Exception as e:
+            flash(f"{e}", "error")
+
+        learnableMoveObjs += addedMoveObjs # combine the list of moves that were in the db with moves that were added to the db
+       
+        damageValues = []
+        statusValues = []
+        for moveObj in learnableMoveObjs: # for every move object this pokemon can learn
+            if moveObj.power == 'none':
+                statusValues.append({"pkmn_id": pkmnObj.id, "move_id": moveObj.id})
+            else:
+                damageValues.append({"pkmn_id": pkmnObj.id, "move_id": moveObj.id})
+
+        try:
+            statusAssociation = statusMovesLearnableByPokemon.insert().values(statusValues)
+            db.session.execute(statusAssociation)
+
+            damageAssociation = damageMovesLearnableByPokemon.insert().values(damageValues)
+            db.session.execute(damageAssociation)
+
             db.session.commit()
-            flash(f"Successfully added {moveName} to DataBase", "success")
-            return move
+            flash("Association created successfully!", "success")
+
+            return True
         except:
-            db.session.rollback()
-            flash(f"Error adding {moveName} to DataBase", "error")
+            flash("Error creating association...", "error")
             return False
 
+    def addMoveToDB(self, data, lastMoveToAdd=True, totalMovesToAdd=1):
+        def findEnglishText(data, key, endpoint):
+            entry = checkNull(data, key)
+            if entry == None:
+                pass
+            else:
+                for text in entry:
+                    if checkNull(text,'language','name') == 'en':
+                        return text[endpoint]
+            return 'none'
+        
+        def checkNull(data, *args):
+            for key in args:
+                data = data.get(key)
+                if data == None:
+                    return 'none'
+            
+            return data  
+        
+        move = PkmnMoves(
+                        checkNull(data,'id'),
+                        moveName := checkNull(data,'name'),
+                        checkNull(data, 'meta','category','name'),
+                        checkNull(data,'power'),
+                        checkNull(data,'meta','min_hits'),
+                        checkNull(data,'meta','max_hits'),
+                        checkNull(data,'meta','ailment','name'),
+                        checkNull(data,'meta','ailment_chance'),
+                        checkNull(data,'type','name'),
+                        checkNull(data,'meta','crit_rate'),
+                        checkNull(data,'meta','drain'),
+                        checkNull(data,'meta','flinch_chance'),
+                        checkNull(data,'meta','healing'),
+                        checkNull(data,'meta','max_turns'),
+                        checkNull(data,'meta','min_turns'),
+                        checkNull(data,'meta','stat_chance'),
+                        checkNull(data,'damage_class','name'),
+                        checkNull(data,'accuracy'),
+                        checkNull(data,'effect_chance'),
+                        checkNull(data,'priority'),
+                        checkNull(data,'pp'),
+                        checkNull(data,'target','name'),
+                        findEnglishText(data, 'effect_entries', 'effect'),
+                        findEnglishText(data, 'flavor_text_entries', 'flavor_text')
+                    )
+        db.session.add(move)
+        
+        if lastMoveToAdd:
+            flash(f"Successfully added {moveName if totalMovesToAdd == 1 else str(totalMovesToAdd) + ' moves'} to DataBase", "success")
+        return move
+       
     def returnPokemonMove(self, form):
         def createMoveDict(data):
             def fromAPI(data):
@@ -89,12 +182,27 @@ class Pokedex():
                 return [
                         data.id,
                         data.name,
+                        data.category,
                         data.power,
-                        data.type,
+                        data.minHits,
+                        data.maxHits,
+                        data.ailment,
+                        data.ailmentChance,
+                        data.moveType,
+                        data.critChance,
+                        data.drain,
+                        data.flinchChance,
+                        data.healing,
+                        data.maxTurns,
+                        data.minTurns,
+                        data.statChance,
                         data.damageClass,
                         data.accuracy,
+                        data.effectChance,
                         data.priority,
                         data.pp,
+                        data.target,
+                        data.effect,
                         data.flavorText
                     ]
 
@@ -163,10 +271,16 @@ class Pokedex():
 
             pokemon = Pkmn(pokedexID, name, spriteURL, spriteShinyURL, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseExp, hp, atk, defense, spatk, spdef, spd)
             
+            
+
             try:
                 db.session.add(pokemon)
                 db.session.commit()
                 flash(f"Successfully added {name} to DataBase!", "success")
+
+                # populate moves db with moves learnable by this pokemon and create relationship between pokemon and its learnable moves
+                if not self.populateMovesDB(data, pokemon):
+                    return False
                 return pokemon
             except:
                 db.session.rollback()
@@ -178,6 +292,8 @@ class Pokedex():
             labels = ["Name:", "ID:", "Type 1:", "Type 2:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]
             
             pokemonInfoDict = dict(zip(labels, pkmnInfo))
+
+
 
             return pokemonInfoDict, pokemon.sprite, pokemon.spriteShiny
             
@@ -192,7 +308,7 @@ class Pokedex():
             identifier = Pkmn.name
 
         pokemon = Pkmn.query.filter(identifier == id).first()
-        
+
         if pokemon:
             if not favorite and not catch and not favoriteSprite and not team:
                 return returnPokemonInfoDict(pokemon)
@@ -209,7 +325,7 @@ class Pokedex():
 
             if pokemon == False:
                 return False
-
+    
         if favorite:
             return pokemon.name, pokemon.id, pokemon.sprite, pokemon.spriteShiny
         elif catch:

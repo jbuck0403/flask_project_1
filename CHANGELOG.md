@@ -49,3 +49,12 @@ CHANGELOG 10
 
 - fixed error adding pokemon with no base exp to db
 - fixed error where Pokedex was not displaying second type
+
+CHANGELOG 11
+
+- added moves table and search move page
+
+CHANGELOG 12
+
+- added bridge tables to show relationships between pokemon and learnable moves
+- added code for when a new pokemon is added to the db to auto-populate moves db with all moves that pokemon can learn

@@ -29,7 +29,7 @@
                height=""
                width=""
                class="sprite delay-show-left">
-          {% if spriteShinyURL %}
+          {% if shinySpriteURL %}
             <img src="{{ shinySpriteURL }}"
                  alt=""
                  height=""
@@ -41,7 +41,7 @@
           <form method="post">
             {{ form.favoritePkmnBtn(class="btn delay-show-bottom") }}
           </form>
-          {% if spriteShinyURL %}
+          {% if shinySpriteURL %}
             <form method="post">
               {{ form.favoriteShinyPkmnBtn(class="btn delay-show-bottom") }}
             </form>

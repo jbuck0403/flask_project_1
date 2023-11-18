@@ -17,8 +17,14 @@ class User(db.Model, UserMixin):
         self.userName = userName
         self.password = generate_password_hash(password)
 
-movesLearnableByPokemon = db.Table(
-    'moves_learned_by_pokemon',
+damageMovesLearnableByPokemon = db.Table(
+    'damage_moves_learned_by_pokemon',
+    db.Column('pkmn_id', db.Integer, db.ForeignKey('pkmn.id')),
+    db.Column('move_id', db.Integer, db.ForeignKey('pkmn_moves.id'))
+)
+
+statusMovesLearnableByPokemon = db.Table(
+    'status_moves_learned_by_pokemon',
     db.Column('pkmn_id', db.Integer, db.ForeignKey('pkmn.id')),
     db.Column('move_id', db.Integer, db.ForeignKey('pkmn_moves.id'))
 )
@@ -40,7 +46,13 @@ class Pkmn(db.Model):
     baseSpAtk = db.Column(db.Integer, nullable=False)
     baseSpDef = db.Column(db.Integer, nullable=False)
     baseSpd = db.Column(db.Integer, nullable=False)
-    moves = relationship('PkmnMoves', secondary=movesLearnableByPokemon, back_populates='knownBy')
+    
+    # Relationship for damage moves
+    damageMoves = relationship('PkmnMoves', secondary=damageMovesLearnableByPokemon, back_populates='damageMovesLearnedBy')
+    
+    # Relationship for status moves
+    statusMoves = relationship('PkmnMoves', secondary=statusMovesLearnableByPokemon, back_populates='statusMovesLearnedBy')
+
 
     def __init__(self, id, name, sprite, spriteShiny, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseEXP, baseHP, baseAtk, baseDef, baseSpAtk, baseSpDef, baseSpd, form=False):
         self.id = id
@@ -61,26 +73,61 @@ class Pkmn(db.Model):
         self.baseSpd = baseSpd
 
 class PkmnMoves(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.String, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
-    power = db.Column(db.Integer, nullable=False)
-    type = db.Column(db.String, nullable=False)
-    damageClass = db.Column(db.String, nullable=False)
-    accuracy = db.Column(db.Integer, nullable=False)
-    priority = db.Column(db.Integer, nullable=False)
-    pp = db.Column(db.Integer, nullable=False)
-    flavorText = db.Column(db.String, nullable=False)
-    knownBy = relationship('Pkmn', secondary=movesLearnableByPokemon, back_populates='moves')
+    category = db.Column(db.String, nullable=True)
+    power = db.Column(db.String, nullable=True)
+    minHits = db.Column(db.String, nullable=True)
+    maxHits = db.Column(db.String, nullable=True)
+    ailment = db.Column(db.String, nullable=True)
+    ailmentChance = db.Column(db.String, nullable=True)
+    moveType = db.Column(db.String, nullable=True)
+    critRate = db.Column(db.String, nullable=True)
+    drain = db.Column(db.String, nullable=True)
+    flinchChance = db.Column(db.String, nullable=True)
+    healing = db.Column(db.String, nullable=True)
+    maxTurns = db.Column(db.String, nullable=True)
+    minTurns = db.Column(db.String, nullable=True)
+    statChance = db.Column(db.String, nullable=True)
+    damageClass = db.Column(db.String, nullable=True)
+    accuracy = db.Column(db.String, nullable=True)
+    effectChance = db.Column(db.String, nullable=True)
+    priority = db.Column(db.String, nullable=True)
+    pp = db.Column(db.String, nullable=True)
+    target = db.Column(db.String, nullable=True)
+    effect = db.Column(db.String, nullable=True)
+    flavorText = db.Column(db.String, nullable=True)
+    
+    # Relationship to represent Pokemon that learn this move as a damage move
+    damageMovesLearnedBy = relationship('Pkmn', secondary=damageMovesLearnableByPokemon, back_populates='damageMoves')
+    
+    # Relationship to represent Pokemon that learn this move as a status move
+    statusMovesLearnedBy = relationship('Pkmn', secondary=statusMovesLearnableByPokemon, back_populates='statusMoves')
 
-    def __init__(self, id, name, power, type, damageClass, accuracy, priority, pp, flavorText):
+    def __init__(self, id, name, category, power, minHits, maxHits, ailment, ailmentChance, moveType, critRate, drain, flinchChance, healing, maxTurns, minTurns, statChance, damageClass, accuracy, effectChance, priority, pp, target, effect, flavorText):
         self.id = id
         self.name = name
+        self.category = category
         self.power = power
-        self.type = type
+        self.minHits = minHits
+        self.maxHits = maxHits
+        self.ailment = ailment
+        self.ailmentChance = ailmentChance
+        self.moveType = moveType
+        self.critRate = critRate
+        self.drain = drain
+        self.flinchChance = flinchChance
+        self.healing = healing
+        self.maxTurns = maxTurns
+        self.minTurns = minTurns
+        self.statChance = statChance
         self.damageClass = damageClass
         self.accuracy = accuracy
+        self.effectChance = effectChance
         self.priority = priority
         self.pp = pp
+        self.target = target
+        self.effect = effect
         self.flavorText = flavorText
 
 class PkmnTeam(db.Model):
