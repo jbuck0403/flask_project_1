@@ -58,3 +58,7 @@ CHANGELOG 12
 
 - added bridge tables to show relationships between pokemon and learnable moves
 - added code for when a new pokemon is added to the db to auto-populate moves db with all moves that pokemon can learn
+
+CHANGELOG 13
+
+- added weakness chart (dict)
