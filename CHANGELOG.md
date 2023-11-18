@@ -62,3 +62,7 @@ CHANGELOG 12
 CHANGELOG 13
 
 - added weakness chart (dict)
+- assign random learnable move on pokemon catch
+- display pokemon name/type/chosen move in team viewer
+- began adding battle logic
+- added auto-populate for unown letters db in case of db erase
