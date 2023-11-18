@@ -7,26 +7,49 @@
     <div class="team-container">
       {% for pkmn in pkmnTeam %}
         {% if sendingToBox %}
-          <div class="sprite-and-btn">
-            <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
+          <div class="sprite-and-btn trigger-div{{ loop.index }}">
+            <img src="{{ pkmn.spriteToDisplay }}"
+                 alt=""
+                 height=""
+                 width=""
+                 class="sprite">
             <form method="post">
               {{ form.deletePkmnBtn(class="btn delay-show-bottom", value=loop.index) }}
             </form>
           </div>
+          <div class="welcome-wrapper hidden-div{{ loop.index }}">
+            <div>{{ pkmn.name }}</div>
+            <div>{{ pkmn.combinedType }}</div>
+            <div>{{ pkmn.move }}</div>
+          </div>
         {% else %}
           {% if instantSprite %}
-            <div class="sprite-and-btn">
-              <img src="{{ pkmn }}" alt="" height="" width="" class="sprite">
+            <div class="sprite-and-btn trigger-div{{ loop.index }}">
+              <img src="{{ pkmn.spriteToDisplay }}"
+                   alt=""
+                   height=""
+                   width=""
+                   class="sprite">
               <button class="btn hidden"></button>
             </div>
+            <div class="welcome-wrapper hidden-div{{ loop.index }}">
+              <div>{{ pkmn.name }}</div>
+              <div>{{ pkmn.combinedType }}</div>
+              <div>{{ pkmn.move }}</div>
+            </div>
           {% else %}
-            <div class="sprite-and-btn">
-              <img src="{{ pkmn }}"
+            <div class="sprite-and-btn trigger-div{{ loop.index }}">
+              <img src="{{ pkmn.spriteToDisplay }}"
                    alt=""
                    height=""
                    width=""
                    class="sprite delay-show{{ loop.index }}">
               <button class="btn hidden"></button>
+            </div>
+            <div class="welcome-wrapper hidden-div{{ loop.index }}">
+              <div>{{ pkmn.name }}</div>
+              <div>{{ pkmn.combinedType }}</div>
+              <div>{{ pkmn.move }}</div>
             </div>
           {% endif %}
         {% endif %}

@@ -73,7 +73,7 @@ class Pkmn(db.Model):
         self.baseSpd = baseSpd
 
 class PkmnMoves(db.Model):
-    id = db.Column(db.String, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String, nullable=False)
     category = db.Column(db.String, nullable=True)
     power = db.Column(db.String, nullable=True)
@@ -135,11 +135,15 @@ class PkmnTeam(db.Model):
     pkmnID = db.Column(db.Integer, db.ForeignKey('pkmn.id'), nullable=False)
     trainerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     shiny = db.Column(db.Boolean, nullable=False)
+    chosenMove = db.Column(db.Integer, db.ForeignKey('pkmn_moves.id'), nullable=True)
+    level = db.Column(db.Integer, nullable=True)
 
-    def __init__(self, pkmnID, trainerID, shiny):
+    def __init__(self, pkmnID, trainerID, shiny, chosenMove, level):
         self.pkmnID = pkmnID,
         self.trainerID = trainerID
         self.shiny = shiny
+        self.chosenMove = chosenMove
+        self.level = level
 
 class UnownLetters(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)

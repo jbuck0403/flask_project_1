@@ -1,11 +1,35 @@
 import requests, random
 from flask import render_template, flash
 from app.models import Pkmn, UnownLetters, db, PkmnMoves, statusMovesLearnableByPokemon, damageMovesLearnableByPokemon
-from sqlalchemy import func
 
 class Pokedex():
     def __init__(self, form=None):
         self.form = form
+
+    def populateUnownAlphabetDB(self):
+        for idx in range(0,28):
+            if idx == 0:
+                mod, idx = '', 201
+            else:
+                idx += 10000
+
+            print(mod,idx)
+
+            url = f"https://pokeapi.co/api/v2/pokemon-form/{mod}{idx}"
+            print(url)
+            response = requests.get(url)
+
+            if not response.ok:
+                print("Error connecting to API...")
+                return response.status_code
+            
+            data = response.json()
+
+            unownLetter = UnownLetters(data['form_names'][6]['name'], data['sprites']['front_default'], data['sprites']['front_shiny'])
+            db.session.add(unownLetter)
+        
+        db.session.commit()
+        return True
 
     def unownSpeller(self, wordToSpell=True):
         errorMessages = ['oops', 'sorry', '?', 'huh', 'nani', 'what', 'wtf']
@@ -189,7 +213,7 @@ class Pokedex():
                         data.ailment,
                         data.ailmentChance,
                         data.moveType,
-                        data.critChance,
+                        data.critRate,
                         data.drain,
                         data.flinchChance,
                         data.healing,
@@ -206,7 +230,7 @@ class Pokedex():
                         data.flavorText
                     ]
 
-            labels = ["ID",'Name','Power','Type','Damage Class','Accuracy','Priority','PP','Flavor Text']
+            labels = ["ID", "Name", "Category", "Power", "Min Hits", "Max Hits", "Ailment", "Ailment Chance", "Move Type", "Crit Rate", "Drain", "Flinch Chance", "Healing", "Max Turns", "Min Turns", "Stat Chance", "Damage Class", "Accuracy", "Effect Chance", "Priority", "PP", "Target", "Effect", "Flavor Text"]
             
             if isinstance(data, PkmnMoves):
                 moveInfo = fromDB(data)

@@ -1,10 +1,12 @@
 from flask import request, render_template, flash, session, redirect, url_for
 import requests
 from .forms import PokedexInputForm
-from app.models import db, PkmnTeam
+from app.models import db, PkmnTeam, damageMovesLearnableByPokemon, PkmnMoves, Pkmn
 from flask_login import current_user, login_required
 from .Pokedex import Pokedex
 from . import pokedexBP
+from sqlalchemy.sql import func
+import random
 
 
 @pokedexBP.route('/moves', methods=['GET','POST'])
@@ -125,14 +127,22 @@ def catch():
            
             if form.returnTeam(numInTeam=True) < 6 and not pokedexID in trainerPkmn:
             
+                filteredQuery = (
+                    db.session.query(damageMovesLearnableByPokemon)
+                    .join(PkmnMoves)
+                    .filter(PkmnMoves.effect == 'Inflicts regular damage.')
+                    .order_by(func.random())
+                    .limit(1)
+                    .first()
+                )
                 try:
-                    newPkmn = PkmnTeam(pokedexID, current_user.id, shiny)
+                    newPkmn = PkmnTeam(pokedexID, current_user.id, shiny, filteredQuery.move_id, 1)
                     db.session.add(newPkmn)
                     db.session.commit()
                     flash(f"{name} caught!", "success")
-                except:
+                except Exception as e:
                     db.session.rollback()
-                    flash(f"Error catching {name}...", "error")
+                    flash(f"Error catching {name}...{e}", "error")
             else:
                 if pokedexID in trainerPkmn:
                     flash(f"Team already has a {name}...", "warning")
@@ -161,33 +171,45 @@ def catch():
 @pokedexBP.route('/team', methods=['GET','POST'])
 @login_required
 def team():
+    def returnTailoredPkmnObj():
+        pokemonFromTeam = form.returnTeam()
+        pkmnObjects = [Pkmn.query.get(pkmn.pkmnID) for pkmn in pokemonFromTeam]
+        pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pokemonFromTeam]
+        for idx, pkmn in enumerate(pkmnTeamURLS):
+            print(pkmnObjects[idx].id)
+            pkmnObjects[idx].spriteToDisplay = pkmn
+            pkmnObjects[idx].combinedType = f"{pkmnObjects[idx].firstType}/{pkmnObjects[idx].secondType}"
+            pkmnObjects[idx].move = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).name)
+
+        return pkmnObjects
+    
     form = PokedexInputForm()
     pokedex = Pokedex(form)
-    pkmnTeam = form.returnTeam()
-    pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pkmnTeam]
+    pkmnObjects = returnTailoredPkmnObj()
+    
     if request.method == 'POST':
         if 'deletePkmnBtn' in request.form:
             
             index = int(request.form.get('deletePkmnBtn').strip()) - 1
             print(index)
             try:
-                pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.id == pkmnTeam[index].id).first()
+                pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.pkmnID == pkmnObjects[index].id).first()
                 db.session.delete(pkmnToDelete)
                 db.session.commit()
                 flash("Successfully sent Pokémon to Box!", "success")
-                pkmnTeam = form.returnTeam()
-                pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pkmnTeam]
+                pkmnObjects = returnTailoredPkmnObj()
+                
             except:
                 db.session.rollback()
                 flash("Error sending Pokémon to Box...", "error")
 
         elif 'cancelBtn' in request.form:
-            return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, instantSprite=True)
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, instantSprite=True)
         
 
-        return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS, sendingToBox=True)
+        return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, sendingToBox=True)
    
-    return render_template('team.jinja', form=form, pkmnTeam=pkmnTeamURLS)
+    return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects)
 
 
 

@@ -510,3 +510,87 @@ nav {
   opacity: 0;
   animation: fadeIn 1s ease-in-out 0s forwards;
 }
+
+.hidden-div1 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div1:hover + .hidden-div1 {
+  opacity: 1;
+}
+
+.hidden-div2 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div2:hover + .hidden-div2 {
+  opacity: 1;
+}
+
+.hidden-div3 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div3:hover + .hidden-div3 {
+  opacity: 1;
+}
+
+.hidden-div3 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div3:hover + .hidden-div3 {
+  opacity: 1;
+}
+
+.hidden-div4 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div4:hover + .hidden-div4 {
+  opacity: 1;
+}
+
+.hidden-div5 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div5:hover + .hidden-div5 {
+  opacity: 1;
+}
+
+.hidden-div6 {
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+.trigger-div6:hover + .hidden-div6 {
+  opacity: 1;
+}

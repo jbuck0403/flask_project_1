@@ -22,10 +22,12 @@
       <div class="pokemon-data-container">
         <table class="pokemon-data delay-show">
           {% for dataLabel, data in moveData %}
-            <tr>
-              <td class="data-label">{{ dataLabel }}:</td>
-              <td class="data">{{ data }}</td>
-            </tr>
+            <div>
+              <tr>
+                <td class="data-label">{{ dataLabel }}:</td>
+                <td class="data">{{ data|title }}</td>
+              </tr>
+            </div>
           {% endfor %}
         </table>
       </div>

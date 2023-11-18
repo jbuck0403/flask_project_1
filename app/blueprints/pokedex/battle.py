@@ -1,3 +1,5 @@
+import copy
+
 class pokemonBattle():
     WEAKNESSCHART = {
     "bug": {
@@ -76,64 +78,72 @@ class pokemonBattle():
 
 
 
-def calculateDamage(self, attacker, defender, move):
-    """ accepts Pkmn and PkmnMove objects """
-    def calculateAttack():
-        if move.damageClass == 'physical':
-            return attacker.baseAtk
-        else:
-            return attacker.baseSpAtk
+    def calculateDamage(self, attacker, defender, move):
+        """ accepts Pkmn and PkmnMove objects """
+        def calculateAttack():
+            if move.damageClass == 'physical':
+                return attacker.baseAtk
+            else:
+                return attacker.baseSpAtk
+            
+        def calculateDefense():
+            if move.damageClass == 'physical':
+                return defender.baseDef
+            else:
+                return defender.baseSpDef
+            
+        def calculateStab():
+            multiplier = 1
+            if move.moveType == attacker.firstType or move.moveType == attacker.secondType:
+                multiplier == 1.5
+            
+            return multiplier
         
-    def calculateDefense():
-        if move.damageClass == 'physical':
-            return defender.baseDef
-        else:
-            return defender.baseSpDef
-        
-    def calculateStab():
-        multiplier = 1
-        if move.moveType == attacker.firstType or move.moveType == attacker.secondType:
-            multiplier == 1.5
-        
-        return multiplier
+        def calculateStrengthWeakness():
+            multiplier = 1
+            attackerStrongAgainst = self.WEAKNESSCHART[move.moveType]['strong']
+            attackerWeakAgainst = self.WEAKNESSCHART[move.moveType]['weak']
+            if attackerStrongAgainst in defender.firstType:
+                multiplier *= 2
+            elif attackerWeakAgainst in defender.firstType:
+                multiplier *= 0.5
+            
+            if attackerStrongAgainst in defender.secondType:
+                multiplier *= 2
+            if attackerWeakAgainst in defender.secondType:
+                multiplier *= 1.5
+            
+            return multiplier
+            
+        attack = calculateAttack()
+        defense = calculateDefense()
+        stabModifier = calculateStab()
+        typeModifier = calculateStrengthWeakness()
+
+        damage = ((2.4 * move.power * (attack/defense) / 50) + 2) * stabModifier * typeModifier
+
+        return damage
     
-    def calculateStrengthWeakness():
-        multiplier = 1
-        attackerStrongAgainst = self.WEAKNESSCHART[move.moveType]['strong']
-        attackerWeakAgainst = self.WEAKNESSCHART[move.moveType]['weak']
-        if attackerStrongAgainst in defender.firstType:
-            multiplier *= 2
-        elif attackerWeakAgainst in defender.firstType:
-            multiplier *= 0.5
-        
-        if attackerStrongAgainst in defender.secondType:
-            multiplier *= 2
-        if attackerWeakAgainst in defender.secondType:
-            multiplier *= 1.5
-        
-        return multiplier
-        
-    attack = calculateAttack()
-    defense = calculateDefense()
-    stabModifier = calculateStab()
-    typeModifier = calculateStrengthWeakness()
+    def returnScaledPokemonCopy(pkmn, level):
+        pkmnCopy = copy.copy(pkmn)
 
-    damage = ((2.4 * move.power * (attack/defense) / 50) + 2) * stabModifier * typeModifier
+        pkmnCopy.hp = (pkmn.baseHP * 2 + 31) * (level/100) + 10 + level
+        pkmnCopy.attack = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
+        pkmnCopy.defense = (pkmn.baseDef * 2 + 31) * (level/100) + 5
+        pkmnCopy.spAttack = (pkmn.baseSpAtk * 2 + 31) * (level/100) + 5
+        pkmnCopy.spDefense = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
+        pkmnCopy.speed = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
 
-    return damage
+        return pkmnCopy
+
+    def battle(self, pkmn1, pkmn2):
+        pokemon1 = self.returnScaledPokemonCopy(pkmn1)
+        pokemon2 = self.returnScaledPokemonCopy(pkmn2)
+
+        while pokemon1.hp > 0 and pokemon2.hp > 0:
+            break
+
     
 
 
 
-# FORMULA
-
-# a = ((2 _ level) / 5) + 2
-# b = power _ (attack if physical attack else spatk )/ (defense if physical attack else spdef)
-
-# c = ((a \* b) / 50) + 2
-
-# d = c \*= 1.5 if move type == pokemon type
-
-# damage = d \*= 1.5 if enemy type is weak to move type
-
-    return damage

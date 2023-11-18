@@ -8,4 +8,6 @@ from app.models import db, PkmnMoves, Pkmn, damageMovesLearnableByPokemon
 def landingPage():
     pokedex = Pokedex()
     
+    # pokedex.populateUnownAlphabetDB() # populate unownLetters db
+    
     return pokedex.unownMessage(None, "welcome",'landingPage.jinja')
