@@ -1,0 +1,26 @@
+{% extends "base.jinja" %}
+{% block title %}
+  {{ playerPkmn.name }} vs {{ enemyPkmn.name }}
+{% endblock title %}
+{% block content %}
+  <div class="content-wrapper">
+    {% if playerPkmn %}
+      <div class="favorite-container">
+        <div>
+          <img src="{{ playerPkmnSprite }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite sprite-player">
+        </div>
+        <div>
+          <img src="{{ enemyPkmnSprite }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite sprite-enemy">
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock content %}

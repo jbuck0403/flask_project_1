@@ -1,11 +1,11 @@
 from flask import request, render_template, flash, session, redirect, url_for
 import requests
-from .forms import PokedexInputForm
+from .forms import PokedexInputForm, PartyForm
 from app.models import db, PkmnTeam, damageMovesLearnableByPokemon, PkmnMoves, Pkmn
 from flask_login import current_user, login_required
 from .Pokedex import Pokedex
 from . import pokedexBP
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, desc, asc
 import random
 
 
@@ -40,7 +40,8 @@ def pokedex():
 
     if request.method == "POST" and form.validate_on_submit():
 
-        pokemonData = pokedex.returnPokemonData(form)
+        pokemonData = pokedex.returnPokemonInfoDict(form)
+        
         if isinstance(pokemonData, int):
             form.pokedexInput.data = ""
             return pokedex.unownMessage(form, True, 'pokedex.jinja')
@@ -85,12 +86,12 @@ def favorite():
                 flash("Error assigning favorite...", "error")
 
         elif "pokedexInput" in request.form and form.validate_on_submit():
-            pokemonData = pokedex.returnPokemonData(form, favorite=True)
+            pokemonData = pokedex.returnPokemonObj(form)
+            print(pokemonData)
             form.pokedexInput.data = ""
             if not isinstance(pokemonData, int):
-                name, pokedexID, sprite, shinySprite = pokemonData
+                name, pokedexID, sprite, shinySprite = pokemonData.name, pokemonData.id, pokemonData.sprite, pokemonData.spriteShiny
             else:
-                # sprite = pokemonData
                 return pokedex.unownMessage(form, True, "favorite.jinja")
             
             session['pokedexID'] = pokedexID
@@ -112,21 +113,18 @@ def remove_favorite():
     return redirect(url_for('pokedexBP.favorite'))
 
 
-@pokedexBP.route('/Tall Grass', methods=['GET','POST'])
+@pokedexBP.route('/tall_grass', methods=['GET','POST'])
 @login_required
 def tallGrass():
-    form = PokedexInputForm()
+    form = PartyForm()
     pokedex = Pokedex(form)
-    form.pokedexInput.label.text = "Tall Grass"
-    
 
     if request.method == "POST":
-        
         if 'enterGrassBtn' not in request.form:
             try:
                 pkmnID = session.pop('pkmnID')
             except Exception as e:
-                breakpoint()
+                print(e)
 
             sprite = session.pop('spriteURL')
             name = session.pop('name')
@@ -135,15 +133,24 @@ def tallGrass():
             canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
 
             if 'battlePkmnBtn' in request.form:
+
                 return redirect(url_for("pokedexBP.battlePokemon", pkmnID = pkmnID))
-            
+
             elif 'catchPkmnBtn' in request.form:
                 if canCatch:
                     
                     move = randomPkmnMove(pkmnID)
                     
                     try:
-                        newPkmn = PkmnTeam(pkmnID, current_user.id, shiny, move.move_id, 1)
+                        highestPosition = PkmnTeam.query.order_by(desc(PkmnTeam.position)).first()
+
+                        if highestPosition == None:
+                            nextPosition = 1
+                        else:
+                            nextPosition = highestPosition.position + 1
+
+                        newPkmn = PkmnTeam(pkmnID, current_user.id, shiny, move.move_id, 1, nextPosition)
+                        
                         db.session.add(newPkmn)
                         db.session.commit()
                         flash(f"{name} caught!", "success")
@@ -162,38 +169,95 @@ def tallGrass():
         else:
             lastPkmnIdx = 1017
             randomPkmn = random.randint(1, lastPkmnIdx + 1)
-            pkmnObj = pokedex.returnPokemonData(randomPkmn, grass=True)
+            pkmnObj = pokedex.returnPokemonObj(randomPkmn)
             
-            try:
-                pkmnID = pkmnObj.id
-            except Exception as e:
-                breakpoint()
+            if pkmnObj:
+                pkmnObj = pokedex.randomShinyChance(pkmnObj)
+                
+                session['pkmnID'] = pkmnObj.id
+                session['shiny'] = pkmnObj.shiny
+                session['name'] = pkmnObj.name
+                session['spriteURL'] = pkmnObj.chosenSprite
+                trainerPkmn = form.returnTeam()
+                
+                canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnObj.id in trainerPkmn
+                
+                return render_template('tallGrass.jinja', form=form, spriteURL=pkmnObj.chosenSprite, name=pkmnObj.name, canCatch=canCatch)
+            
+            else:
+                flash("Error getting Pokémon...", "error")
 
-            session['pkmnID'] = pkmnID
-            session['shiny'] = pkmnObj.shiny
-            session['name'] = pkmnObj.name
-            session['spriteURL'] = pkmnObj.chosenSprite
-            trainerPkmn = form.returnTeam()
-            try:
-                canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
-            except Exception as e:
-                breakpoint()
-            
-            return render_template('tallGrass.jinja', form=form, spriteURL=pkmnObj.chosenSprite, name=pkmnObj.name, canCatch=canCatch)
-    
     return render_template('tallGrass.jinja', form=form)
     
+@pokedexBP.route('/battle/<int:pkmn_id>')
+@login_required
+def battle(pkmn_id):
+    
+    return render_template('battle.jinja')
+
+
 def randomPkmnMove(pkmnID):
     move = (
-                    db.session.query(damageMovesLearnableByPokemon)
-                    .join(PkmnMoves)
-                    .filter(damageMovesLearnableByPokemon.c.pkmn_id == pkmnID)
-                    .filter(PkmnMoves.effect == 'Inflicts regular damage.')
-                    .order_by(func.random())
-                    .limit(1)
-                    .first()
-                )
+            db.session.query(damageMovesLearnableByPokemon)
+            .join(PkmnMoves)
+            .filter(damageMovesLearnableByPokemon.c.pkmn_id == pkmnID)
+            .filter(PkmnMoves.effect == 'Inflicts regular damage.')
+            .order_by(func.random())
+            .limit(1)
+            .first()
+            )
     return move
+
+@pokedexBP.route('/team', methods=['GET','POST'])
+@login_required
+def team():
+    def returnTailoredPkmnObj():
+        pokemonFromTeam = form.returnTeam()
+        pkmnObjects = [Pkmn.query.get(pkmn.pkmnID) for pkmn in pokemonFromTeam]
+        pkmnTeamURLS = [pokedex.returnPokemonSprite(pkmn.pkmnID, shiny=pkmn.shiny) for pkmn in pokemonFromTeam]
+
+        for idx, pkmn in enumerate(pkmnTeamURLS):
+            pkmnObjects[idx].spriteToDisplay = pkmn
+            pkmnObjects[idx].combinedType = f"{pkmnObjects[idx].firstType}{'/' + pkmnObjects[idx].secondType if pkmnObjects[idx].secondType != 'None' else ''}"
+            pkmnObjects[idx].move = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).name)
+            pkmnObjects[idx].moveType = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).moveType)
+            pkmnObjects[idx].nameAndType = f"{pkmnObjects[idx].name} [{pkmnObjects[idx].combinedType}]"
+            pkmnObjects[idx].moveAndType = f"{pkmnObjects[idx].move} [{pkmnObjects[idx].moveType}]"
+
+        return pkmnObjects
+    
+    form = PartyForm()
+    pokedex = Pokedex(form)
+    pkmnObjects = returnTailoredPkmnObj()
+    
+    if request.method == 'POST':
+        print(request.form)
+        if 'reorderBtn' in request.form:
+            index = int(request.form.get('reorderBtn').strip()) - 1
+            form.swapPkmnPosition(index)
+            pkmnObjects = returnTailoredPkmnObj()
+
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, reordering=True)
+        
+        elif 'deletePkmnBtn' in request.form:
+            index = int(request.form.get('deletePkmnBtn').strip()) - 1
+            form.removeFromTeam(index)
+            pkmnObjects = returnTailoredPkmnObj()
+
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, sendingToBox=True)
+
+        elif 'cancelBtn' in request.form:
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, instantSprite=True)
+        
+        elif 'setPartyLeaderBtn' in request.form:
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, reordering=True)    
+
+        elif 'sendToBoxBtn' in request.form:
+            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, sendingToBox=True)
+
+    return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects)
+
+
 
 # @pokedexBP.route('/catch_pokemon/<int:pkmnID>/<bool:shiny>')
 # @login_required
@@ -285,52 +349,3 @@ def randomPkmnMove(pkmnID):
 
 #     form.pokedexInput.data = ""    
 #     return render_template("catch.jinja", form=form)
-
-@pokedexBP.route('/team', methods=['GET','POST'])
-@login_required
-def team():
-    def returnTailoredPkmnObj():
-        pokemonFromTeam = form.returnTeam()
-        pkmnObjects = [Pkmn.query.get(pkmn.pkmnID) for pkmn in pokemonFromTeam]
-        pkmnTeamURLS = [pokedex.returnPokemonData(pkmn.pkmnID, team=True, shiny=pkmn.shiny) for pkmn in pokemonFromTeam]
-        for idx, pkmn in enumerate(pkmnTeamURLS):
-            print(pkmnObjects[idx].id)
-            pkmnObjects[idx].spriteToDisplay = pkmn
-            pkmnObjects[idx].combinedType = f"{pkmnObjects[idx].firstType}{'/' + pkmnObjects[idx].secondType if pkmnObjects[idx].secondType != 'None' else ''}"
-            pkmnObjects[idx].move = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).name)
-            pkmnObjects[idx].moveType = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).moveType)
-            pkmnObjects[idx].nameAndType = f"{pkmnObjects[idx].name} [{pkmnObjects[idx].combinedType}]"
-            pkmnObjects[idx].moveAndType = f"{pkmnObjects[idx].move} [{pkmnObjects[idx].moveType}]"
-
-        return pkmnObjects
-    
-    form = PokedexInputForm()
-    pokedex = Pokedex(form)
-    pkmnObjects = returnTailoredPkmnObj()
-    
-    if request.method == 'POST':
-        if 'deletePkmnBtn' in request.form:
-            
-            index = int(request.form.get('deletePkmnBtn').strip()) - 1
-            print(index)
-            try:
-                pkmnToDelete = PkmnTeam.query.filter(PkmnTeam.pkmnID == pkmnObjects[index].id).first()
-                db.session.delete(pkmnToDelete)
-                db.session.commit()
-                flash("Successfully sent Pokémon to Box!", "success")
-                pkmnObjects = returnTailoredPkmnObj()
-                
-            except:
-                db.session.rollback()
-                flash("Error sending Pokémon to Box...", "error")
-
-        elif 'cancelBtn' in request.form:
-            return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, instantSprite=True)
-        
-
-        return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects, sendingToBox=True)
-   
-    return render_template('team.jinja', form=form, pkmnTeam=pkmnObjects)
-
-
-

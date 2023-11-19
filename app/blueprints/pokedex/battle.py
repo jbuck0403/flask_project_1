@@ -2,81 +2,79 @@ import copy
 
 class pokemonBattle():
     WEAKNESSCHART = {
-    "bug": {
-        "weak": ["fire", "flying", "rock"],
-        "strong": ["dark", "grass", "psychic"]
-    },
-    "dark": {
-        "weak": ["bug", "fairy", "fighting"],
-        "strong": ["ghost", "psychic"]
-    },
-    "dragon": {
-        "weak": ["dragon", "ice", "fairy"],
-        "strong": ["dragon"]
-    },
-    "electric": {
-        "weak": ["ground"],
-        "strong": ["water", "flying"]
-    },
-    "fairy": {
-        "weak": ["poison", "steel"],
-        "strong": ["dark", "dragon", "fighting"]
-    },
-    "fighting": {
-        "weak": ["fairy", "flying", "psychic"],
-        "strong": ["dark", "ice", "normal", "rock", "steel"]
-    },
-    "fire": {
-        "weak": ["water", "rock", "ground"],
-        "strong": ["bug", "grass", "ice", "steel"]
-    },
-    "flying": {
-        "weak": ["electric", "ice", "rock"],
-        "strong": ["bug", "fighting", "grass"]
-    },
-    "ghost": {
-        "weak": ["dark", "ghost"],
-        "strong": ["psychic", "ghost"]
-    },
-    "grass": {
-        "weak": ["fire", "ice", "poison", "flying", "bug"],
-        "strong": ["ground", "rock", "water"]
-    },
-    "ground": {
-        "weak": ["grass", "ice", "water"],
-        "strong": ["electric", "poison", "rock", "steel"]
-    },
-    "ice": {
-        "weak": ["fire", "fighting", "rock", "steel"],
-        "strong": ["dragon", "flying", "grass", "ground"]
-    },
-    "normal": {
-        "weak": ["fighting"],
-        "strong": []
-    },
-    "poison": {
-        "weak": ["ground", "psychic"],
-        "strong": ["fairy", "grass"]
-    },
-    "psychic": {
-        "weak": ["bug", "dark", "ghost"],
-        "strong": ["fighting", "poison"]
-    },
-    "rock": {
-        "weak": ["fighting", "grass", "ground", "steel", "water"],
-        "strong": ["bug", "fire", "flying", "ice"]
-    },
-    "steel": {
-        "weak": ["fighting", "fire", "ground"],
-        "strong": ["fairy", "ice", "rock"]
-    },
-    "water": {
-        "weak": ["electric", "grass"],
-        "strong": ["fire", "ground", "rock"]
+        "bug": {
+            "weak": ["fire", "flying", "rock"],
+            "strong": ["dark", "grass", "psychic"]
+        },
+        "dark": {
+            "weak": ["bug", "fairy", "fighting"],
+            "strong": ["ghost", "psychic"]
+        },
+        "dragon": {
+            "weak": ["dragon", "ice", "fairy"],
+            "strong": ["dragon"]
+        },
+        "electric": {
+            "weak": ["ground"],
+            "strong": ["water", "flying"]
+        },
+        "fairy": {
+            "weak": ["poison", "steel"],
+            "strong": ["dark", "dragon", "fighting"]
+        },
+        "fighting": {
+            "weak": ["fairy", "flying", "psychic"],
+            "strong": ["dark", "ice", "normal", "rock", "steel"]
+        },
+        "fire": {
+            "weak": ["water", "rock", "ground"],
+            "strong": ["bug", "grass", "ice", "steel"]
+        },
+        "flying": {
+            "weak": ["electric", "ice", "rock"],
+            "strong": ["bug", "fighting", "grass"]
+        },
+        "ghost": {
+            "weak": ["dark", "ghost"],
+            "strong": ["psychic", "ghost"]
+        },
+        "grass": {
+            "weak": ["fire", "ice", "poison", "flying", "bug"],
+            "strong": ["ground", "rock", "water"]
+        },
+        "ground": {
+            "weak": ["grass", "ice", "water"],
+            "strong": ["electric", "poison", "rock", "steel"]
+        },
+        "ice": {
+            "weak": ["fire", "fighting", "rock", "steel"],
+            "strong": ["dragon", "flying", "grass", "ground"]
+        },
+        "normal": {
+            "weak": ["fighting"],
+            "strong": []
+        },
+        "poison": {
+            "weak": ["ground", "psychic"],
+            "strong": ["fairy", "grass"]
+        },
+        "psychic": {
+            "weak": ["bug", "dark", "ghost"],
+            "strong": ["fighting", "poison"]
+        },
+        "rock": {
+            "weak": ["fighting", "grass", "ground", "steel", "water"],
+            "strong": ["bug", "fire", "flying", "ice"]
+        },
+        "steel": {
+            "weak": ["fighting", "fire", "ground"],
+            "strong": ["fairy", "ice", "rock"]
+        },
+        "water": {
+            "weak": ["electric", "grass"],
+            "strong": ["fire", "ground", "rock"]
+        }
     }
-}
-
-
 
     def calculateDamage(self, attacker, defender, move):
         """ accepts Pkmn and PkmnMove objects """

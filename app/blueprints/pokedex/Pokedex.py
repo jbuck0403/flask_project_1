@@ -1,7 +1,7 @@
 import requests, random
 from flask import render_template, flash
 from app.models import Pkmn, UnownLetters, db, PkmnMoves, statusMovesLearnableByPokemon, damageMovesLearnableByPokemon
-from forms import PokedexInputForm
+from .forms import PokedexInputForm
 
 class Pokedex():
     def __init__(self, form=None):
@@ -14,14 +14,11 @@ class Pokedex():
             else:
                 idx += 10000
 
-            print(mod,idx)
-
             url = f"https://pokeapi.co/api/v2/pokemon-form/{mod}{idx}"
-            print(url)
+
             response = requests.get(url)
 
             if not response.ok:
-                print("Error connecting to API...")
                 return response.status_code
             
             data = response.json()
@@ -264,6 +261,18 @@ class Pokedex():
             data = response.json() # process the json
             return createMoveDict(data) # process the json and add to db, then return dict
 
+    def randomShinyChance(self, pkmnObj):
+        shinyChance = random.randint(1,10)
+        
+        shiny = True if shinyChance == 5 and pkmnObj.spriteShiny != None else False
+        pkmnObj.shiny = shiny
+    
+        pkmnObj.spriteShiny
+        pkmnObj.chosenSprite = pkmnObj.spriteShiny if shiny else pkmnObj.sprite
+    
+        pkmnObj.chosenSprite = pkmnObj.sprite
+        return pkmnObj
+
     def returnPokemonObj(self, form):
         def populatePkmnTableFromAPI(data):
             def unpackTuple(arr):
@@ -279,6 +288,8 @@ class Pokedex():
             
             spriteURL = data['sprites']['front_default']
             spriteShinyURL = data['sprites']['front_shiny']
+            spriteBackURL = data['sprites']['back_default']
+            spriteShinyBackURL = data['sprites']['front_shiny']
             pokedexID = data['id']
             name = data['name'].title()
             abilities = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == False]
@@ -294,7 +305,7 @@ class Pokedex():
             firstAbility, secondAbility = unpackTuple(abilities)
             hp, atk, defense, spatk, spdef, spd = unpackStats(data)
 
-            pokemon = Pkmn(pokedexID, name, spriteURL, spriteShinyURL, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseExp, hp, atk, defense, spatk, spdef, spd)
+            pokemon = Pkmn(pokedexID, name, spriteURL, spriteShinyURL, spriteBackURL, spriteShinyBackURL, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseExp, hp, atk, defense, spatk, spdef, spd)
 
             try:
                 db.session.add(pokemon)
@@ -313,17 +324,21 @@ class Pokedex():
         if isinstance(form, PokedexInputForm):
             id = form.pokedexInput.data
         else:
-            if form.isdigit():
-                identifier = Pkmn.id
-            else:
-                identifier = Pkmn.name
+            id = form
+        
+        if isinstance(id, int) or id.isdigit():
+            id = str(id)
+            identifier = Pkmn.id
+        else:
+            id = self.titlePokemon(id)
+            identifier = Pkmn.name
         
         pokemon = Pkmn.query.filter(identifier == id).first()
-
         if pokemon:
             return pokemon
         else:
             url = f"https://pokeapi.co/api/v2/pokemon/{id.lower()}"
+            
             response = requests.get(url)
 
             if not response.ok or id.isspace():
@@ -344,12 +359,15 @@ class Pokedex():
         if shiny:
             return pokemon.spriteShiny
         elif both:
-            return [pokemon.sprite, pokemon.spriteShiny]
+            return (pokemon.sprite, pokemon.spriteShiny)
         else:
             return pokemon.sprite
     
     def returnPokemonInfoDict(self, form):
         pokemon = self.returnPokemonObj(form)
+        
+        if isinstance(pokemon, int):
+            return pokemon
 
         pkmnInfo = [pokemon.name, pokemon.id, pokemon.firstType, pokemon.secondType, pokemon.firstAbility, pokemon.secondAbility, pokemon.hiddenAbility, pokemon.baseEXP, pokemon.baseHP, pokemon.baseAtk, pokemon.baseDef, pokemon.baseSpAtk, pokemon.baseSpDef, pokemon.baseSpd]
         labels = ["Name:", "ID:", "Type 1:", "Type 2:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]

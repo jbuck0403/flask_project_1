@@ -595,3 +595,7 @@ nav {
 .trigger-div6:hover + .hidden-div6 {
   opacity: 1;
 }
+
+.top-delete {
+  bottom: 6%;
+}

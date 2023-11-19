@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 993f42547391
+Revision ID: 73e9c2bad5af
 Revises: 
-Create Date: 2023-11-18 01:35:17.308312
+Create Date: 2023-11-18 22:59:37.954993
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '993f42547391'
+revision = '73e9c2bad5af'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,6 +35,8 @@ def upgrade():
     sa.Column('baseSpAtk', sa.Integer(), nullable=False),
     sa.Column('baseSpDef', sa.Integer(), nullable=False),
     sa.Column('baseSpd', sa.Integer(), nullable=False),
+    sa.Column('spriteBack', sa.String(), nullable=False),
+    sa.Column('spriteShinyBack', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('pkmn_moves',
@@ -93,6 +95,7 @@ def upgrade():
     sa.Column('shiny', sa.Boolean(), nullable=False),
     sa.Column('chosenMove', sa.Integer(), nullable=True),
     sa.Column('level', sa.Integer(), nullable=True),
+    sa.Column('position', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['chosenMove'], ['pkmn_moves.id'], ),
     sa.ForeignKeyConstraint(['pkmnID'], ['pkmn.id'], ),
     sa.ForeignKeyConstraint(['trainerID'], ['user.id'], ),

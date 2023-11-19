@@ -46,6 +46,8 @@ class Pkmn(db.Model):
     baseSpAtk = db.Column(db.Integer, nullable=False)
     baseSpDef = db.Column(db.Integer, nullable=False)
     baseSpd = db.Column(db.Integer, nullable=False)
+    spriteBack = db.Column(db.String, nullable=False)
+    spriteShinyBack = db.Column(db.String, nullable=True)
     
     # Relationship for damage moves
     damageMoves = relationship('PkmnMoves', secondary=damageMovesLearnableByPokemon, back_populates='damageMovesLearnedBy')
@@ -54,11 +56,13 @@ class Pkmn(db.Model):
     statusMoves = relationship('PkmnMoves', secondary=statusMovesLearnableByPokemon, back_populates='statusMovesLearnedBy')
 
 
-    def __init__(self, id, name, sprite, spriteShiny, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseEXP, baseHP, baseAtk, baseDef, baseSpAtk, baseSpDef, baseSpd, form=False):
+    def __init__(self, id, name, sprite, spriteShiny, spriteBack, spriteShinyBack, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseEXP, baseHP, baseAtk, baseDef, baseSpAtk, baseSpDef, baseSpd, form=False):
         self.id = id
         self.name = name
         self.sprite = sprite
         self.spriteShiny = spriteShiny
+        self.spriteBack = spriteBack
+        self.spriteShinyBack = spriteShinyBack
         self.firstType = firstType
         self.secondType = secondType
         self.firstAbility = firstAbility
@@ -137,13 +141,16 @@ class PkmnTeam(db.Model):
     shiny = db.Column(db.Boolean, nullable=False)
     chosenMove = db.Column(db.Integer, db.ForeignKey('pkmn_moves.id'), nullable=True)
     level = db.Column(db.Integer, nullable=True)
+    position = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, pkmnID, trainerID, shiny, chosenMove, level):
+    def __init__(self, pkmnID, trainerID, shiny, chosenMove, level, position):
         self.pkmnID = pkmnID,
         self.trainerID = trainerID
         self.shiny = shiny
         self.chosenMove = chosenMove
         self.level = level
+        self.position = position
+    
 
 class UnownLetters(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)

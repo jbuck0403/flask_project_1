@@ -6,7 +6,7 @@
   <div class="content-wrapper">
     <div class="team-container">
       {% for pkmn in pkmnTeam %}
-        {% if sendingToBox %}
+        {% if sendingToBox or reordering %}
           <div class="sprite-and-btn trigger-div{{ loop.index }}">
             <img src="{{ pkmn.spriteToDisplay }}"
                  alt=""
@@ -14,7 +14,11 @@
                  width=""
                  class="sprite">
             <form method="post">
-              {{ form.deletePkmnBtn(class="btn delay-show-bottom", value=loop.index) }}
+              {% if sendingToBox %}
+                {{ form.deletePkmnBtn(class="btn delay-show-bottom", value=loop.index) }}
+              {% elif reordering %}
+                {{ form.reorderBtn(class="btn delay-show-bottom", value=loop.index) }}
+              {% endif %}
             </form>
           </div>
           <div class="welcome-wrapper hidden-div{{ loop.index }}">
@@ -55,10 +59,13 @@
   </div>
   <form method="post">
     <div class="input-form-wrapper delay-show">
-      {% if sendingToBox %}
-        {{ form.cancelBtn(class="btn delete-btn") }}
+      {% if sendingToBox or reordering %}
+        {{ form.cancelBtn(class_="btn delete-btn") }}
       {% else %}
-        {{ form.sendToBoxBtn(class="btn delete-btn") }}
+        <div class="input-form-wrapper">
+          {% if pkmnTeam|length > 1 %}{{ form.setPartyLeaderBtn(class_="btn top-delete delete-btn") }}{% endif %}
+          {{ form.sendToBoxBtn(class_="btn delete-btn") }}
+        </div>
       {% endif %}
     </div>
   </form>
