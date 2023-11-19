@@ -1,6 +1,6 @@
-import copy
+import copy, random, math
 
-class pokemonBattle():
+class PokemonBattle():
     WEAKNESSCHART = {
         "bug": {
             "weak": ["fire", "flying", "rock"],
@@ -76,39 +76,39 @@ class pokemonBattle():
         }
     }
 
-    def calculateDamage(self, attacker, defender, move):
+    def calculateDamage(self, attacker, defender):
         """ accepts Pkmn and PkmnMove objects """
         def calculateAttack():
-            if move.damageClass == 'physical':
-                return attacker.baseAtk
+            if attacker.move.damageClass == 'physical':
+                return attacker.scaledAtk
             else:
-                return attacker.baseSpAtk
+                return attacker.scaledSpAtk
             
         def calculateDefense():
-            if move.damageClass == 'physical':
-                return defender.baseDef
+            if attacker.move.damageClass == 'physical':
+                return defender.scaledDef
             else:
-                return defender.baseSpDef
+                return defender.scaledSpDef
             
         def calculateStab():
             multiplier = 1
-            if move.moveType == attacker.firstType or move.moveType == attacker.secondType:
+            if attacker.move.moveType == attacker.firstType or attacker.move.moveType == attacker.secondType:
                 multiplier == 1.5
             
             return multiplier
         
         def calculateStrengthWeakness():
             multiplier = 1
-            attackerStrongAgainst = self.WEAKNESSCHART[move.moveType]['strong']
-            attackerWeakAgainst = self.WEAKNESSCHART[move.moveType]['weak']
-            if attackerStrongAgainst in defender.firstType:
+            defenderWeakAgainst = self.WEAKNESSCHART[attacker.move.moveType]['weak']
+            defenderStrongAgainst = self.WEAKNESSCHART[attacker.move.moveType]['strong']
+            if attacker.firstType in defenderWeakAgainst:
                 multiplier *= 2
-            elif attackerWeakAgainst in defender.firstType:
+            elif attacker.firstType in defenderStrongAgainst:
                 multiplier *= 0.5
             
-            if attackerStrongAgainst in defender.secondType:
+            if attacker.secondType in defenderWeakAgainst:
                 multiplier *= 2
-            if attackerWeakAgainst in defender.secondType:
+            elif attacker.secondType in defenderStrongAgainst:
                 multiplier *= 1.5
             
             return multiplier
@@ -118,29 +118,69 @@ class pokemonBattle():
         stabModifier = calculateStab()
         typeModifier = calculateStrengthWeakness()
 
-        damage = ((2.4 * move.power * (attack/defense) / 50) + 2) * stabModifier * typeModifier
+        damage = ((((((2 * int(attacker.level))/5) + 2) * int(attacker.move.power) * (attack/defense)) / 50) + 2) * stabModifier * typeModifier
 
-        return damage
+        if typeModifier > 1:
+            return damage, True
+        return math.floor(damage), False
     
-    def returnScaledPokemonCopy(pkmn, level):
-        pkmnCopy = copy.copy(pkmn)
+    def returnScaledPokemon(self, pkmn, level):
+        pkmn.level = level
+        pkmn.scaledHP = (pkmn.baseHP * 2 + 31) * (level/100) + 10 + level
+        pkmn.scaledAtk = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
+        pkmn.scaledDef = (pkmn.baseDef * 2 + 31) * (level/100) + 5
+        pkmn.scaledSpAtk = (pkmn.baseSpAtk * 2 + 31) * (level/100) + 5
+        pkmn.scaledSpDef = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
+        pkmn.scaledSpd = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
 
-        pkmnCopy.hp = (pkmn.baseHP * 2 + 31) * (level/100) + 10 + level
-        pkmnCopy.attack = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
-        pkmnCopy.defense = (pkmn.baseDef * 2 + 31) * (level/100) + 5
-        pkmnCopy.spAttack = (pkmn.baseSpAtk * 2 + 31) * (level/100) + 5
-        pkmnCopy.spDefense = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
-        pkmnCopy.speed = (pkmn.baseAtk * 2 + 31) * (level/100) + 5
+        return pkmn
 
-        return pkmnCopy
 
     def battle(self, pkmn1, pkmn2):
-        pokemon1 = self.returnScaledPokemonCopy(pkmn1)
-        pokemon2 = self.returnScaledPokemonCopy(pkmn2)
+        def hit(move):
+            hitChance = random.randint(1,101)
+            missThreshold = 100 - int(move.accuracy)
 
-        while pokemon1.hp > 0 and pokemon2.hp > 0:
-            break
+            if hitChance > missThreshold:
+                return True
+            
+            return False
+        pokemon1 = self.returnScaledPokemon(pkmn1, 100)
+        pokemon2 = self.returnScaledPokemon(pkmn2, 100)
+        battleLog = []
 
+        firstRound = True
+        while pokemon1.scaledHP > 0 and pokemon2.scaledHP > 0:
+            if firstRound:
+                if pokemon1.scaledSpd > pokemon2.scaledSpd:
+                    attacker = pokemon1
+                    defender = pokemon2
+                else:
+                    attacker = pokemon2
+                    defender = pokemon1
+
+                firstRound = False
+            else:
+                attacker, defender = defender, attacker
+
+
+            battleLog.append(f"{attacker.name} used {attacker.move.name}")
+            if hit(pokemon1.move):
+                damage, superEffective = self.calculateDamage(attacker, defender)
+                defender.scaledHP -= damage
+                battleLog.append(f"{attacker.name} hit {defender.name} for {damage} damage!")
+                if superEffective:
+                    battleLog.append("It's super effective!")
+            else:
+                battleLog.append(f"{attacker.name} missed.")
+    
+
+        if defender.scaledHP > attacker.scaledHP:
+            battleLog.append(f"{defender.name} wins!")
+        else:
+            battleLog.append(f"{attacker.name} wins!")
+                
+        return battleLog
     
 
 

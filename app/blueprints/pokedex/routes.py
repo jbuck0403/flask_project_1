@@ -7,6 +7,7 @@ from .Pokedex import Pokedex
 from . import pokedexBP
 from sqlalchemy.sql import func, desc, asc
 import random
+from .battle import PokemonBattle
 
 
 @pokedexBP.route('/moves', methods=['GET','POST'])
@@ -134,7 +135,7 @@ def tallGrass():
 
             if 'battlePkmnBtn' in request.form:
 
-                return redirect(url_for("pokedexBP.battlePokemon", pkmnID = pkmnID))
+                return redirect(url_for("pokedexBP.battle", pkmnID = pkmnID))
 
             elif 'catchPkmnBtn' in request.form:
                 if canCatch:
@@ -189,11 +190,24 @@ def tallGrass():
 
     return render_template('tallGrass.jinja', form=form)
     
-@pokedexBP.route('/battle/<int:pkmn_id>')
+@pokedexBP.route('/battle/<int:pkmnID>')
 @login_required
-def battle(pkmn_id):
-    
-    return render_template('battle.jinja')
+def battle(pkmnID):
+    form = PartyForm()
+    pokedex = Pokedex(form)
+    match = PokemonBattle()
+
+    team = form.returnTeam()
+    playerPkmn = Pkmn.query.get(team[0].pkmnID)
+    playerPkmn.level = team[0].level
+    playerPkmn.move = PkmnMoves.query.get(team[0].chosenMove)
+    enemyPkmn = Pkmn.query.filter(Pkmn.id == pkmnID).first()
+    enemyPkmn.level = team[0].level
+    enemyPkmn.move = PkmnMoves.query.filter(PkmnMoves.id == randomPkmnMove(pkmnID)[1]).first()
+
+    outcome = match.battle(playerPkmn, enemyPkmn)
+
+    return render_template('battle.jinja', playerPkmn = playerPkmn, enemyPkmn = enemyPkmn, outcome = outcome)
 
 
 def randomPkmnMove(pkmnID):

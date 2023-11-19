@@ -599,3 +599,12 @@ nav {
 .top-delete {
   bottom: 6%;
 }
+
+.sprite-player {
+  margin-right: 30vw;
+}
+
+.sprite-enemy {
+  margin-left: 30vw;
+  margin-bottom: 5vh;
+}

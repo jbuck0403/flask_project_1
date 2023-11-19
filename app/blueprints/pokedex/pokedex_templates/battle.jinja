@@ -7,20 +7,21 @@
     {% if playerPkmn %}
       <div class="favorite-container">
         <div>
-          <img src="{{ playerPkmnSprite }}"
-               alt=""
-               height=""
-               width=""
-               class="sprite sprite-player">
-        </div>
-        <div>
-          <img src="{{ enemyPkmnSprite }}"
+          <img src="{{ enemyPkmn.sprite }}"
                alt=""
                height=""
                width=""
                class="sprite sprite-enemy">
         </div>
+        <div>
+          <img src="{{ playerPkmn.spriteBack }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite sprite-player">
+        </div>
       {% endif %}
     </div>
+    {% for line in outcome %}<div>{{ line }}</div>{% endfor %}
   </div>
 {% endblock content %}
