@@ -1,6 +1,7 @@
 import requests, random
 from flask import render_template, flash
 from app.models import Pkmn, UnownLetters, db, PkmnMoves, statusMovesLearnableByPokemon, damageMovesLearnableByPokemon
+from forms import PokedexInputForm
 
 class Pokedex():
     def __init__(self, form=None):
@@ -263,7 +264,7 @@ class Pokedex():
             data = response.json() # process the json
             return createMoveDict(data) # process the json and add to db, then return dict
 
-    def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False, team=False):
+    def returnPokemonObj(self, form):
         def populatePkmnTableFromAPI(data):
             def unpackTuple(arr):
                 if len(arr) > 1:
@@ -294,8 +295,6 @@ class Pokedex():
             hp, atk, defense, spatk, spdef, spd = unpackStats(data)
 
             pokemon = Pkmn(pokedexID, name, spriteURL, spriteShinyURL, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseExp, hp, atk, defense, spatk, spdef, spd)
-            
-            
 
             try:
                 db.session.add(pokemon)
@@ -310,32 +309,19 @@ class Pokedex():
                 db.session.rollback()
                 flash(f"Error adding {name} to DataBase...", "error")
                 return False
-
-        def returnPokemonInfoDict(pokemon):
-            pkmnInfo = [pokemon.name, pokemon.id, pokemon.firstType, pokemon.secondType, pokemon.firstAbility, pokemon.secondAbility, pokemon.hiddenAbility, pokemon.baseEXP, pokemon.baseHP, pokemon.baseAtk, pokemon.baseDef, pokemon.baseSpAtk, pokemon.baseSpDef, pokemon.baseSpd]
-            labels = ["Name:", "ID:", "Type 1:", "Type 2:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]
             
-            pokemonInfoDict = dict(zip(labels, pkmnInfo))
-
-
-
-            return pokemonInfoDict, pokemon.sprite, pokemon.spriteShiny
-            
-        if favoriteSprite or team:
-            id = str(form)
+        if isinstance(form, PokedexInputForm):
+            id = form.pokedexInput.data
         else:
-            id = self.titlePokemon(form.pokedexInput.data)
-
-        if id.isdigit():
-            identifier = Pkmn.id
-        else:
-            identifier = Pkmn.name
-
+            if form.isdigit():
+                identifier = Pkmn.id
+            else:
+                identifier = Pkmn.name
+        
         pokemon = Pkmn.query.filter(identifier == id).first()
 
         if pokemon:
-            if not favorite and not catch and not favoriteSprite and not team:
-                return returnPokemonInfoDict(pokemon)
+            return pokemon
         else:
             url = f"https://pokeapi.co/api/v2/pokemon/{id.lower()}"
             response = requests.get(url)
@@ -350,15 +336,134 @@ class Pokedex():
             if pokemon == False:
                 return False
     
-        if favorite:
-            return pokemon.name, pokemon.id, pokemon.sprite, pokemon.spriteShiny
-        elif catch:
-            shinyChance = random.randint(1,10)
-            return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 and pokemon.spriteShiny != None else pokemon.sprite, True if shinyChance == 5 and pokemon.spriteShiny != None else False
-        elif favoriteSprite or team:
-            if shiny:
-                return pokemon.spriteShiny
-            else:
-                return pokemon.sprite
+            return pokemon
+
+    def returnPokemonSprite(self, form, shiny=False, both=False):
+        pokemon = self.returnPokemonObj(form)
+
+        if shiny:
+            return pokemon.spriteShiny
+        elif both:
+            return [pokemon.sprite, pokemon.spriteShiny]
         else:
-            return returnPokemonInfoDict(pokemon)
+            return pokemon.sprite
+    
+    def returnPokemonInfoDict(self, form):
+        pokemon = self.returnPokemonObj(form)
+
+        pkmnInfo = [pokemon.name, pokemon.id, pokemon.firstType, pokemon.secondType, pokemon.firstAbility, pokemon.secondAbility, pokemon.hiddenAbility, pokemon.baseEXP, pokemon.baseHP, pokemon.baseAtk, pokemon.baseDef, pokemon.baseSpAtk, pokemon.baseSpDef, pokemon.baseSpd]
+        labels = ["Name:", "ID:", "Type 1:", "Type 2:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]
+        
+        pokemonInfoDict = dict(zip(labels, pkmnInfo))
+
+        return pokemonInfoDict, pokemon.sprite, pokemon.spriteShiny
+            
+
+    # def returnPokemonData(self, form, favorite=False, catch=False, favoriteSprite=False, shiny=False, team=False, grass=False):
+    #     def populatePkmnTableFromAPI(data):
+    #         def unpackTuple(arr):
+    #             if len(arr) > 1:
+    #                 return arr[0], arr[1]
+    #             else:
+    #                 return arr[0], 'None'
+            
+    #         def unpackStats(data):
+    #             hp, atk, defense, spatk, spdef, spd = [stat['base_stat'] for stat in data['stats']]
+
+    #             return hp, atk, defense, spatk, spdef, spd
+            
+    #         spriteURL = data['sprites']['front_default']
+    #         spriteShinyURL = data['sprites']['front_shiny']
+    #         pokedexID = data['id']
+    #         name = data['name'].title()
+    #         abilities = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == False]
+    #         baseExp = data['base_experience']
+    #         pokemonType = [pkmnType['type']['name'].title() for pkmnType in data['types']]
+            
+    #         try:
+    #             hiddenAbility = [ability['ability']['name'].title() for ability in data['abilities'] if ability['is_hidden'] == True][0]
+    #         except:
+    #             hiddenAbility = 'None'
+
+    #         firstType, secondType = unpackTuple(pokemonType)
+    #         firstAbility, secondAbility = unpackTuple(abilities)
+    #         hp, atk, defense, spatk, spdef, spd = unpackStats(data)
+
+    #         pokemon = Pkmn(pokedexID, name, spriteURL, spriteShinyURL, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseExp, hp, atk, defense, spatk, spdef, spd)
+
+    #         try:
+    #             db.session.add(pokemon)
+    #             db.session.commit()
+    #             flash(f"Successfully added {name} to DataBase!", "success")
+
+    #             # populate moves db with moves learnable by this pokemon and create relationship between pokemon and its learnable moves
+    #             if not self.populateMovesDB(data, pokemon):
+    #                 return False
+    #             return pokemon
+    #         except:
+    #             db.session.rollback()
+    #             flash(f"Error adding {name} to DataBase...", "error")
+    #             return False
+
+    #     def returnPokemonInfoDict(pokemon):
+    #         pkmnInfo = [pokemon.name, pokemon.id, pokemon.firstType, pokemon.secondType, pokemon.firstAbility, pokemon.secondAbility, pokemon.hiddenAbility, pokemon.baseEXP, pokemon.baseHP, pokemon.baseAtk, pokemon.baseDef, pokemon.baseSpAtk, pokemon.baseSpDef, pokemon.baseSpd]
+    #         labels = ["Name:", "ID:", "Type 1:", "Type 2:", "Ability 1:", "Ability 2:", "Hidden Ability:", "Base Exp:", "HP:", "ATK:", "DEF:", "SPATK:", "SPDEF:", "SPD:"]
+            
+    #         pokemonInfoDict = dict(zip(labels, pkmnInfo))
+
+
+
+    #         return pokemonInfoDict, pokemon.sprite, pokemon.spriteShiny
+            
+    #     if favoriteSprite or team or grass:
+    #         id = str(form)
+    #     else:
+    #         id = self.titlePokemon(form.pokedexInput.data)
+
+    #     if id.isdigit():
+    #         identifier = Pkmn.id
+    #     else:
+    #         identifier = Pkmn.name
+
+    #     pokemon = Pkmn.query.filter(identifier == id).first()
+
+    #     if pokemon:
+    #         if not favorite and not catch and not favoriteSprite and not team:
+    #             return returnPokemonInfoDict(pokemon)
+    #     else:
+    #         url = f"https://pokeapi.co/api/v2/pokemon/{id.lower()}"
+    #         response = requests.get(url)
+
+    #         if not response.ok or id.isspace():
+    #             return response.status_code
+            
+    #         data = response.json()
+
+    #         pokemon = populatePkmnTableFromAPI(data)
+
+    #         if pokemon == False:
+    #             return False
+    
+    #     if favorite:
+    #         return pokemon.name, pokemon.id, pokemon.sprite, pokemon.spriteShiny
+    #     elif catch:
+    #         shinyChance = random.randint(1,10)
+    #         return pokemon.name, pokemon.id, pokemon.spriteShiny if shinyChance == 5 and pokemon.spriteShiny != None else pokemon.sprite, True if shinyChance == 5 and pokemon.spriteShiny != None else False
+    #     elif favoriteSprite or team:
+    #         if shiny:
+    #             return pokemon.spriteShiny
+    #         else:
+    #             return pokemon.sprite
+    #     elif grass:
+    #         shinyChance = random.randint(1,10)
+    #         shiny = True if shinyChance == 5 and pokemon.spriteShiny != None else False
+    #         pokemon.shiny = shiny
+    #         pokemon.chosenSprite = pokemon.spriteShiny if shiny else pokemon.sprite
+    #         try:
+    #             pkmnID = pokemon.id
+    #         except Exception as e:
+    #             breakpoint()
+
+    #         return pokemon
+    #     else:
+    #         return returnPokemonInfoDict(pokemon)

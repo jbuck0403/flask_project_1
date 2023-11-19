@@ -1,0 +1,32 @@
+{% extends "base.jinja" %}
+{% block title %}
+  Tall Grass
+{% endblock title %}
+{% block content %}
+  <div class="content-wrapper">
+    {% if spriteURL %}
+      <div class="favorite-container">
+        <div class="delay-show">A wild {{ name }} appears!</div>
+        <div>
+          <img src="{{ spriteURL }}"
+               alt=""
+               height=""
+               width=""
+               class="sprite delay-show-bottom">
+        </div>
+        <form method="post">
+          {{ form.battlePkmnBtn(class="btn top-btn delay-show-bottom") }}
+        </form>
+        {% if canCatch %}
+          <form method="post">
+            {{ form.catchPkmnBtn(class="btn delay-show-bottom") }}
+          </form>
+        </div>
+      {% endif %}
+    {% else %}
+      <form method="post">
+        {{ form.enterGrassBtn(class="btn delay-show-bottom") }}
+      </form>
+    {% endif %}
+  </div>
+{% endblock content %}

@@ -97,6 +97,7 @@ nav {
 
 .data {
   text-align: left;
+  max-width: 50vw;
 }
 
 .app-container {

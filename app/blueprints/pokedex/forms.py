@@ -12,6 +12,8 @@ class PokedexInputForm(FlaskForm):
     sendToBoxBtn = SubmitField('Send To Box')
     deletePkmnBtn = SubmitField('Delete')
     cancelBtn = SubmitField('Cancel')
+    battlePkmnBtn = SubmitField('Battle')
+    enterGrassBtn = SubmitField('Enter Grass')
 
     def returnTeam(self, numInTeam=False):
         # team = [[pkmn.pkmnID, pkmn.shiny, pkmn.id] for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]

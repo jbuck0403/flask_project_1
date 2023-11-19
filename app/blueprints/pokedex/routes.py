@@ -111,62 +111,180 @@ def remove_favorite():
     
     return redirect(url_for('pokedexBP.favorite'))
 
-@pokedexBP.route('/catch', methods=['GET','POST'])
+
+@pokedexBP.route('/Tall Grass', methods=['GET','POST'])
 @login_required
-def catch():
+def tallGrass():
     form = PokedexInputForm()
     pokedex = Pokedex(form)
-    form.pokedexInput.label.text = "Catch Pokémon"
+    form.pokedexInput.label.text = "Tall Grass"
+    
 
     if request.method == "POST":
-        if "catchPkmnBtn" in request.form:
-            pokedexID = session.pop('pokedexID')
-            shiny = session.pop('shiny')
+        
+        if 'enterGrassBtn' not in request.form:
+            try:
+                pkmnID = session.pop('pkmnID')
+            except Exception as e:
+                breakpoint()
+
+            sprite = session.pop('spriteURL')
             name = session.pop('name')
-            trainerPkmn = [pkmn.pkmnID for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
-           
-            if form.returnTeam(numInTeam=True) < 6 and not pokedexID in trainerPkmn:
+            shiny = session.pop('shiny')
+            trainerPkmn = form.returnTeam()
+            canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
+
+            if 'battlePkmnBtn' in request.form:
+                return redirect(url_for("pokedexBP.battlePokemon", pkmnID = pkmnID))
             
-                filteredQuery = (
+            elif 'catchPkmnBtn' in request.form:
+                if canCatch:
+                    
+                    move = randomPkmnMove(pkmnID)
+                    
+                    try:
+                        newPkmn = PkmnTeam(pkmnID, current_user.id, shiny, move.move_id, 1)
+                        db.session.add(newPkmn)
+                        db.session.commit()
+                        flash(f"{name} caught!", "success")
+                    except Exception as e:
+                        db.session.rollback()
+                        flash(f"Error catching {name}...{e}", "error")
+                else:
+                    if pkmnID in trainerPkmn:
+                        flash(f"Team already has a {name}...", "warning")
+                    else:
+                        flash("Team is full...", "warning")
+                    return render_template('tallGrass.jinja', form=form, spriteURL=sprite, canCatch=canCatch)
+                
+                return render_template('tallGrass.jinja', form=form)
+                            
+        else:
+            lastPkmnIdx = 1017
+            randomPkmn = random.randint(1, lastPkmnIdx + 1)
+            pkmnObj = pokedex.returnPokemonData(randomPkmn, grass=True)
+            
+            try:
+                pkmnID = pkmnObj.id
+            except Exception as e:
+                breakpoint()
+
+            session['pkmnID'] = pkmnID
+            session['shiny'] = pkmnObj.shiny
+            session['name'] = pkmnObj.name
+            session['spriteURL'] = pkmnObj.chosenSprite
+            trainerPkmn = form.returnTeam()
+            try:
+                canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
+            except Exception as e:
+                breakpoint()
+            
+            return render_template('tallGrass.jinja', form=form, spriteURL=pkmnObj.chosenSprite, name=pkmnObj.name, canCatch=canCatch)
+    
+    return render_template('tallGrass.jinja', form=form)
+    
+def randomPkmnMove(pkmnID):
+    move = (
                     db.session.query(damageMovesLearnableByPokemon)
                     .join(PkmnMoves)
+                    .filter(damageMovesLearnableByPokemon.c.pkmn_id == pkmnID)
                     .filter(PkmnMoves.effect == 'Inflicts regular damage.')
                     .order_by(func.random())
                     .limit(1)
                     .first()
                 )
-                try:
-                    newPkmn = PkmnTeam(pokedexID, current_user.id, shiny, filteredQuery.move_id, 1)
-                    db.session.add(newPkmn)
-                    db.session.commit()
-                    flash(f"{name} caught!", "success")
-                except Exception as e:
-                    db.session.rollback()
-                    flash(f"Error catching {name}...{e}", "error")
-            else:
-                if pokedexID in trainerPkmn:
-                    flash(f"Team already has a {name}...", "warning")
-                else:
-                    flash("Team is full...", "warning")
+    return move
 
-        elif "pokedexInput" in request.form and form.validate_on_submit():
-            pokemonData = pokedex.returnPokemonData(form, catch=True)
-            if not isinstance(pokemonData, int):
-                name, pokedexID, sprite, shiny = pokemonData
-            else:
-                sprite = pokemonData
+# @pokedexBP.route('/catch_pokemon/<int:pkmnID>/<bool:shiny>')
+# @login_required
+# def catchPokemon(pkmnID, shiny):
+#     form = PokedexInputForm()
+#     pokedex = Pokedex(form)
+#     pkmnObj = pokedex.returnPokemonData(pkmnID, grass=True, foundInGrass=True, shintDecidedshiny=shiny)
+#     print("from catchPokemon",pkmnObj)
+#     trainerPkmn = [pkmn.pkmnID for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
+#     pkmnID = pkmnObj.id
+#     name = pkmnObj.name
+#     move = randomPkmnMove(pkmnID)
 
-            form.pokedexInput.data = ""
-            if isinstance(sprite, int):
-                return pokedex.unownMessage(form, True, "catch.jinja")
+#     if form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn:
             
-            session['pokedexID'] = pokedexID
-            session['shiny'] = shiny
-            session['name'] = name
+#                 move = randomPkmnMove()
+#                 try:
+                    
+#                     newPkmn = PkmnTeam(pkmnID, current_user.id, pkmnObj.shiny, move.move_id, 1)
+#                     db.session.add(newPkmn)
+#                     db.session.commit()
+#                     flash(f"{name} caught!", "success")
+#                 except Exception as e:
+#                     db.session.rollback()
+#                     flash(f"Error catching {name}...{e}", "error")
+#     else:
+#         if pkmnID in trainerPkmn:
+#             flash(f"Team already has a {name}...", "warning")
+#         else:
+#             flash("Team is full...", "warning")
+    
+#     return redirect(url_for('pokedexBP.tallGrass'))
+
+# @pokedexBP.route('/battle_pokemon/<int:pkmn_id>')
+# @login_required
+# def battlePokemon(pkmn_id):
+#     pass
+
+# @pokedexBP.route('/catch', methods=['GET','POST'])
+# @login_required
+# def catch():
+#     form = PokedexInputForm()
+#     pokedex = Pokedex(form)
+#     form.pokedexInput.label.text = "Catch Pokémon"
+
+#     if request.method == "POST":
+#         if "catchPkmnBtn" in request.form:
+#             pokedexID = session.pop('pokedexID')
+#             shiny = session.pop('shiny')
+#             name = session.pop('name')
+#             trainerPkmn = [pkmn.pkmnID for pkmn in PkmnTeam.query.filter(PkmnTeam.trainerID == current_user.id).all()]
+           
+#             if form.returnTeam(numInTeam=True) < 6 and not pokedexID in trainerPkmn:
             
-            return render_template("catch.jinja", form=form, spriteURL=sprite, name=name)
-    form.pokedexInput.data = ""    
-    return render_template("catch.jinja", form=form)
+#                 move = randomPkmnMove(pokedexID)
+
+#                 try:
+#                     newPkmn = PkmnTeam(pokedexID, current_user.id, shiny, move.move_id, 1)
+#                     db.session.add(newPkmn)
+#                     db.session.commit()
+#                     flash(f"{name} caught!", "success")
+#                 except Exception as e:
+#                     db.session.rollback()
+#                     flash(f"Error catching {name}...{e}", "error")
+#             else:
+#                 if pokedexID in trainerPkmn:
+#                     flash(f"Team already has a {name}...", "warning")
+#                 else:
+#                     flash("Team is full...", "warning")
+
+#         elif "pokedexInput" in request.form and form.validate_on_submit():
+#             pokemonData = pokedex.returnPokemonData(form, catch=True)
+#             if not isinstance(pokemonData, int):
+#                 name, pokedexID, sprite, shiny = pokemonData
+#             else:
+#                 sprite = pokemonData
+
+#             form.pokedexInput.data = ""
+#             if isinstance(sprite, int):
+#                 return pokedex.unownMessage(form, True, "catch.jinja")
+            
+#             session['pokedexID'] = pokedexID
+#             session['shiny'] = shiny
+#             session['name'] = name
+            
+#             return render_template("catch.jinja", form=form, spriteURL=sprite, name=name)
+#         elif "battlePkmnBtn" in request.form:
+#             pass
+
+#     form.pokedexInput.data = ""    
+#     return render_template("catch.jinja", form=form)
 
 @pokedexBP.route('/team', methods=['GET','POST'])
 @login_required
@@ -178,8 +296,11 @@ def team():
         for idx, pkmn in enumerate(pkmnTeamURLS):
             print(pkmnObjects[idx].id)
             pkmnObjects[idx].spriteToDisplay = pkmn
-            pkmnObjects[idx].combinedType = f"{pkmnObjects[idx].firstType}/{pkmnObjects[idx].secondType}"
+            pkmnObjects[idx].combinedType = f"{pkmnObjects[idx].firstType}{'/' + pkmnObjects[idx].secondType if pkmnObjects[idx].secondType != 'None' else ''}"
             pkmnObjects[idx].move = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).name)
+            pkmnObjects[idx].moveType = pokedex.titlePokemon(PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).moveType)
+            pkmnObjects[idx].nameAndType = f"{pkmnObjects[idx].name} [{pkmnObjects[idx].combinedType}]"
+            pkmnObjects[idx].moveAndType = f"{pkmnObjects[idx].move} [{pkmnObjects[idx].moveType}]"
 
         return pkmnObjects
     

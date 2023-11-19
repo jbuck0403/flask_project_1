@@ -18,9 +18,8 @@
             </form>
           </div>
           <div class="welcome-wrapper hidden-div{{ loop.index }}">
-            <div>{{ pkmn.name }}</div>
-            <div>{{ pkmn.combinedType }}</div>
-            <div>{{ pkmn.move }}</div>
+            <div>{{ pkmn.nameAndType }}</div>
+            <div>{{ pkmn.moveAndType }}</div>
           </div>
         {% else %}
           {% if instantSprite %}
@@ -33,9 +32,8 @@
               <button class="btn hidden"></button>
             </div>
             <div class="welcome-wrapper hidden-div{{ loop.index }}">
-              <div>{{ pkmn.name }}</div>
-              <div>{{ pkmn.combinedType }}</div>
-              <div>{{ pkmn.move }}</div>
+              <div>{{ pkmn.nameAndType }}</div>
+              <div>{{ pkmn.moveAndType }}</div>
             </div>
           {% else %}
             <div class="sprite-and-btn trigger-div{{ loop.index }}">
@@ -47,9 +45,8 @@
               <button class="btn hidden"></button>
             </div>
             <div class="welcome-wrapper hidden-div{{ loop.index }}">
-              <div>{{ pkmn.name }}</div>
-              <div>{{ pkmn.combinedType }}</div>
-              <div>{{ pkmn.move }}</div>
+              <div>{{ pkmn.nameAndType }}</div>
+              <div>{{ pkmn.moveAndType }}</div>
             </div>
           {% endif %}
         {% endif %}
