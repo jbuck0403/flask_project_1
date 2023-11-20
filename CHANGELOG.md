@@ -66,3 +66,9 @@ CHANGELOG 13
 - display pokemon name/type/chosen move in team viewer
 - began adding battle logic
 - added auto-populate for unown letters db in case of db erase
+
+CHANGELOG 14
+
+- added ability to battle pokemon
+- now randomly assign newly caught pokemon a learnable move
+- added page to battle random pokemon

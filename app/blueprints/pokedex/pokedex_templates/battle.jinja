@@ -22,6 +22,9 @@
         </div>
       {% endif %}
     </div>
-    {% for line in outcome %}<div>{{ line }}</div>{% endfor %}
+    <div class="input-form-wrapper">
+      {% for line in outcome %}<div>{{ line }}</div>{% endfor %}
+      <a href="{{ nextRoute }}" class="btn link-btn">Continue</a>
+    </div>
   </div>
 {% endblock content %}

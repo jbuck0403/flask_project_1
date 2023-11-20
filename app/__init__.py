@@ -18,9 +18,11 @@ loginManager.init_app(app)
 db.init_app(app)
 migrate = Migrate(app, db)
 
+
 @loginManager.user_loader
 def loadUser(user_id):
     return User.query.get(user_id)
+
 
 app.register_blueprint(account)
 app.register_blueprint(main)

@@ -7,8 +7,8 @@ from app.blueprints.pokedex.Pokedex import Pokedex
 def injectFavoriteSprite():
     if current_user.is_authenticated and current_user.favoritePkmn != None:
         pokedex = Pokedex()
-        favoritePkmn = current_user.favoritePkmn.split(',')
-        pkmnID, spriteType = favoritePkmn[0], False if favoritePkmn[1] == 'd' else True
+        favoritePkmn = current_user.favoritePkmn.split(",")
+        pkmnID, spriteType = favoritePkmn[0], False if favoritePkmn[1] == "d" else True
 
         favoriteSprite = pokedex.returnPokemonSprite(pkmnID, shiny=spriteType)
     else:

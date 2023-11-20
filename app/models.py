@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
 
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     userName = db.Column(db.String, nullable=False, unique=True)
@@ -17,17 +18,19 @@ class User(db.Model, UserMixin):
         self.userName = userName
         self.password = generate_password_hash(password)
 
+
 damageMovesLearnableByPokemon = db.Table(
-    'damage_moves_learned_by_pokemon',
-    db.Column('pkmn_id', db.Integer, db.ForeignKey('pkmn.id')),
-    db.Column('move_id', db.Integer, db.ForeignKey('pkmn_moves.id'))
+    "damage_moves_learned_by_pokemon",
+    db.Column("pkmn_id", db.Integer, db.ForeignKey("pkmn.id")),
+    db.Column("move_id", db.Integer, db.ForeignKey("pkmn_moves.id")),
 )
 
 statusMovesLearnableByPokemon = db.Table(
-    'status_moves_learned_by_pokemon',
-    db.Column('pkmn_id', db.Integer, db.ForeignKey('pkmn.id')),
-    db.Column('move_id', db.Integer, db.ForeignKey('pkmn_moves.id'))
+    "status_moves_learned_by_pokemon",
+    db.Column("pkmn_id", db.Integer, db.ForeignKey("pkmn.id")),
+    db.Column("move_id", db.Integer, db.ForeignKey("pkmn_moves.id")),
 )
+
 
 class Pkmn(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -48,15 +51,43 @@ class Pkmn(db.Model):
     baseSpd = db.Column(db.Integer, nullable=False)
     spriteBack = db.Column(db.String, nullable=False)
     spriteShinyBack = db.Column(db.String, nullable=True)
-    
+
     # Relationship for damage moves
-    damageMoves = relationship('PkmnMoves', secondary=damageMovesLearnableByPokemon, back_populates='damageMovesLearnedBy')
-    
+    damageMoves = relationship(
+        "PkmnMoves",
+        secondary=damageMovesLearnableByPokemon,
+        back_populates="damageMovesLearnedBy",
+    )
+
     # Relationship for status moves
-    statusMoves = relationship('PkmnMoves', secondary=statusMovesLearnableByPokemon, back_populates='statusMovesLearnedBy')
+    statusMoves = relationship(
+        "PkmnMoves",
+        secondary=statusMovesLearnableByPokemon,
+        back_populates="statusMovesLearnedBy",
+    )
 
-
-    def __init__(self, id, name, sprite, spriteShiny, spriteBack, spriteShinyBack, firstType, secondType, firstAbility, secondAbility, hiddenAbility, baseEXP, baseHP, baseAtk, baseDef, baseSpAtk, baseSpDef, baseSpd, form=False):
+    def __init__(
+        self,
+        id,
+        name,
+        sprite,
+        spriteShiny,
+        spriteBack,
+        spriteShinyBack,
+        firstType,
+        secondType,
+        firstAbility,
+        secondAbility,
+        hiddenAbility,
+        baseEXP,
+        baseHP,
+        baseAtk,
+        baseDef,
+        baseSpAtk,
+        baseSpDef,
+        baseSpd,
+        form=False,
+    ):
         self.id = id
         self.name = name
         self.sprite = sprite
@@ -75,6 +106,7 @@ class Pkmn(db.Model):
         self.baseSpAtk = baseSpAtk
         self.baseSpDef = baseSpDef
         self.baseSpd = baseSpd
+
 
 class PkmnMoves(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -101,14 +133,44 @@ class PkmnMoves(db.Model):
     target = db.Column(db.String, nullable=True)
     effect = db.Column(db.String, nullable=True)
     flavorText = db.Column(db.String, nullable=True)
-    
-    # Relationship to represent Pokemon that learn this move as a damage move
-    damageMovesLearnedBy = relationship('Pkmn', secondary=damageMovesLearnableByPokemon, back_populates='damageMoves')
-    
-    # Relationship to represent Pokemon that learn this move as a status move
-    statusMovesLearnedBy = relationship('Pkmn', secondary=statusMovesLearnableByPokemon, back_populates='statusMoves')
 
-    def __init__(self, id, name, category, power, minHits, maxHits, ailment, ailmentChance, moveType, critRate, drain, flinchChance, healing, maxTurns, minTurns, statChance, damageClass, accuracy, effectChance, priority, pp, target, effect, flavorText):
+    # Relationship to represent Pokemon that learn this move as a damage move
+    damageMovesLearnedBy = relationship(
+        "Pkmn", secondary=damageMovesLearnableByPokemon, back_populates="damageMoves"
+    )
+
+    # Relationship to represent Pokemon that learn this move as a status move
+    statusMovesLearnedBy = relationship(
+        "Pkmn", secondary=statusMovesLearnableByPokemon, back_populates="statusMoves"
+    )
+
+    def __init__(
+        self,
+        id,
+        name,
+        category,
+        power,
+        minHits,
+        maxHits,
+        ailment,
+        ailmentChance,
+        moveType,
+        critRate,
+        drain,
+        flinchChance,
+        healing,
+        maxTurns,
+        minTurns,
+        statChance,
+        damageClass,
+        accuracy,
+        effectChance,
+        priority,
+        pp,
+        target,
+        effect,
+        flavorText,
+    ):
         self.id = id
         self.name = name
         self.category = category
@@ -134,23 +196,24 @@ class PkmnMoves(db.Model):
         self.effect = effect
         self.flavorText = flavorText
 
+
 class PkmnTeam(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    pkmnID = db.Column(db.Integer, db.ForeignKey('pkmn.id'), nullable=False)
-    trainerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    pkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
+    trainerID = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     shiny = db.Column(db.Boolean, nullable=False)
-    chosenMove = db.Column(db.Integer, db.ForeignKey('pkmn_moves.id'), nullable=True)
+    chosenMove = db.Column(db.Integer, db.ForeignKey("pkmn_moves.id"), nullable=True)
     level = db.Column(db.Integer, nullable=True)
     position = db.Column(db.Integer, nullable=False)
 
     def __init__(self, pkmnID, trainerID, shiny, chosenMove, level, position):
-        self.pkmnID = pkmnID,
+        self.pkmnID = (pkmnID,)
         self.trainerID = trainerID
         self.shiny = shiny
         self.chosenMove = chosenMove
         self.level = level
         self.position = position
-    
+
 
 class UnownLetters(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -163,3 +226,29 @@ class UnownLetters(db.Model):
         self.sprite = sprite
         self.spriteShiny = spriteShiny
 
+
+class BattleLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    battleID = db.Column(db.Integer, nullable=False)
+    turnID = db.Column(db.Integer, nullable=False)
+    playerID = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    enemyID = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    playerPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
+    enemyPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
+    playerPkmnHP = db.Column(db.Integer, nullable=False)
+    enemyPkmnHP = db.Column(db.Integer, nullable=False)
+
+
+class Battle(db.Models):
+    id
+    playerID
+    enemyID
+
+
+class Turn(db.Models):
+    id
+    battleID
+    playerPkmn
+    enemyPlayerPkmn
+    playerPkmnHP
+    enemyPlayerPkmnHP
