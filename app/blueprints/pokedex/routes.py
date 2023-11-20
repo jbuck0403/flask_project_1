@@ -1,7 +1,14 @@
 from flask import request, render_template, flash, session, redirect, url_for
 import requests
 from .forms import PokedexInputForm, PartyForm
-from app.models import db, PkmnTeam, damageMovesLearnableByPokemon, PkmnMoves, Pkmn, Battle
+from app.models import (
+    db,
+    PkmnTeam,
+    damageMovesLearnableByPokemon,
+    PkmnMoves,
+    Pkmn,
+    Battle,
+)
 from flask_login import current_user, login_required
 from .Pokedex import Pokedex
 from . import pokedexBP
@@ -149,7 +156,7 @@ def tallGrass():
             canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
 
             if "battlePkmnBtn" in request.form:
-                return redirect(url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=0))
+                return redirect(url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=0, battleID=0))
 
             elif "catchPkmnBtn" in request.form:
                 if canCatch:
@@ -231,60 +238,91 @@ def tallGrass():
     return render_template("tallGrass.jinja", form=form)
 
 
-@pokedexBP.route("/battle/<int:pkmnID><int:trainerID>", methods=["GET", "POST"])
+@pokedexBP.route("/battle/<int:pkmnID>/<int:trainerID>/<int:battleID>/<int:firstTurn>", methods=["GET", "POST"])
 @login_required
-def battle(pkmnID, trainerID):
+def battle(pkmnID, trainerID, battleID, firstTurn):
     form = PartyForm()
     match = PokemonBattle()
+
+    if session.get('winner'):
+        flash(f"{session.pop('winner')} wins!")
+        if session.get('playerPkmnID'):
+            session.pop('playerPkmnID')
+        if session.get('enemyPkmnID'):
+            session.pop('enemyPkmnID')
+        return redirect(url_for('pokedexBP.battleTower'))
 
     previousRoute = request.headers.get("Referer")
     if previousRoute != None:
         previousRoute = previousRoute.split("/")
         previousRoute = previousRoute[len(previousRoute) - 1]
-        if previousRoute == 'tall_grass':
+        if previousRoute == "tall_grass":
             cameFromTallGrass = True
         else:
             cameFromTallGrass = False
+    else:
+        return redirect(url_for("pokedexBP.tallGrass"))
 
-    if session.get('battleID') == None and not cameFromTallGrass:
-        battle = Battle(current_user.id, trainerID)
-        session['battleID'] = battle.id
-        db.session.add(battle)
-        db.session.commit()
+    team = form.returnTeam()  # return the current users team
 
-    team = form.returnTeam()
+    if team:
+        if cameFromTallGrass:
+            playerPkmn = Pkmn.query.get(team[0].pkmnID)
+            playerPkmn.level = team[0].level
+            playerPkmn.move = PkmnMoves.query.get(team[0].chosenMoveID)
 
-    if team and trainerID == 0:
-        playerPkmn = Pkmn.query.get(team[0].pkmnID)
-        playerPkmn.level = team[0].level
-        playerPkmn.move = PkmnMoves.query.get(team[0].chosenMove)
+            enemyPkmn = Pkmn.query.filter(Pkmn.id == pkmnID).first()
 
-        enemyPkmn = Pkmn.query.filter(Pkmn.id == pkmnID).first()
-        if trainerID == 0:
             enemyPkmn.level = team[0].level
             enemyPkmn.move = PkmnMoves.query.filter(
                 PkmnMoves.id == randomPkmnMove(pkmnID)[1]
             ).first()
-        else:
-            enemyTeam = form.returnTeam(enemyID=trainerID)
 
-        outcome, winner = match.battle(playerPkmn, enemyPkmn)
-        
-        
+            outcome = match.duel(playerPkmn, enemyPkmn)
 
-        if previousRoute == "tall_grass":
             nextRoute = url_for("pokedexBP.tallGrass")
-        else:
-            nextRoute = url_for("pokedexBP.battleTower")
 
+        else:
+            
+            if firstTurn == 1:
+                if session.get('playerPkmnID'):
+                    session.pop('playerPkmnID')
+                if session.get('enemyPkmnID'):
+                    session.pop('enemyPkmnID')
+                if session.get('winner'):
+                    session.pop('winner')
+            
+                battle = Battle(current_user.id, trainerID)  # start the battle
+                db.session.add(battle)  # add to the battle table
+                db.session.commit()
+                battleID = battle.id
+            
+            enemyTeam = form.returnTeam(
+                enemyID=trainerID
+            )  # get the enemy team from tainerID
+            
+            
+            if firstTurn == 1:
+                playerPkmn = Pkmn.query.filter_by(id=team[0].pkmn.id).first()
+                enemyPkmn = Pkmn.query.filter_by(id=enemyTeam[0].pkmn.id).first()
+            else:
+                playerPkmn = Pkmn.query.filter_by(id=session.get('playerPkmnID')).first()
+                enemyPkmn = Pkmn.query.filter_by(id=session.get('enemyPkmnID')).first()
+            
+            
+            nextRoute = url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=trainerID, battleID=battleID, firstTurn=0)
+            outcome = match.teamBattle(team, enemyTeam, battleID, firstTurn)
+
+        
         return render_template(
-            "battle.jinja",
-            form=form,
-            playerPkmn=playerPkmn,
-            enemyPkmn=enemyPkmn,
-            outcome=outcome,
-            nextRoute=nextRoute,
-        )
+                "battle.jinja",
+                form=form,
+                playerPkmn=playerPkmn,
+                enemyPkmn=enemyPkmn,
+                outcome=outcome.split('/'),
+                nextRoute=nextRoute,
+            )
+
     else:
         flash("Team is currently empty...", "warning")
         return redirect(url_for("pokedexBP.tallGrass"))
@@ -320,10 +358,10 @@ def team():
                 idx
             ].combinedType = f"{pkmnObjects[idx].firstType}{'/' + pkmnObjects[idx].secondType if pkmnObjects[idx].secondType != 'None' else ''}"
             pkmnObjects[idx].move = pokedex.titlePokemon(
-                PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).name
+                PkmnMoves.query.get(pokemonFromTeam[idx].chosenMoveID).name
             )
             pkmnObjects[idx].moveType = pokedex.titlePokemon(
-                PkmnMoves.query.get(pokemonFromTeam[idx].chosenMove).moveType
+                PkmnMoves.query.get(pokemonFromTeam[idx].chosenMoveID).moveType
             )
             pkmnObjects[
                 idx

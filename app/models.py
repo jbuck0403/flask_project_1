@@ -12,9 +12,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     userName = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
-    dateCreated = db.Column(
-        db.DateTime, nullable=False, default=datetime.utcnow()
-    )
+    dateCreated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow())
     favoritePkmn = db.Column(db.String(10))
 
     def __init__(self, userName, password):
@@ -205,15 +203,18 @@ class PkmnTeam(db.Model):
     pkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
     trainerID = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     shiny = db.Column(db.Boolean, nullable=False)
-    chosenMove = db.Column(db.Integer, db.ForeignKey("pkmn_moves.id"), nullable=True)
+    chosenMoveID = db.Column(db.Integer, db.ForeignKey("pkmn_moves.id"), nullable=True)
     level = db.Column(db.Integer, nullable=True)
     position = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, pkmnID, trainerID, shiny, chosenMove, level, position):
+    pkmn = relationship("Pkmn", foreign_keys=[pkmnID])
+    move = relationship("PkmnMoves", foreign_keys=[chosenMoveID])
+
+    def __init__(self, pkmnID, trainerID, shiny, chosenMoveID, level, position):
         self.pkmnID = (pkmnID,)
         self.trainerID = trainerID
         self.shiny = shiny
-        self.chosenMove = chosenMove
+        self.chosenMoveID = chosenMoveID
         self.level = level
         self.position = position
 
@@ -245,53 +246,28 @@ class Turn(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     battleID = db.Column(db.Integer, db.ForeignKey("battle.id"), nullable=False)
     playerPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
-    playerPkmnShiny = db.Column(db.Boolean, nullable=False)
     playerPkmnHP = db.Column(db.Integer, nullable=False)
-    playerPkmnDamageTaken = db.Column(db.Integer, nullable=False)
-    playerPkmnMove = db.Column(db.Integer, nullable=False)
-    playerPkmnLevel = db.Column(db.Integer, nullable=False)
-    playerPkmnPosition = db.Column(db.Integer, nullable=False)
     enemyPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
-    enemyPkmnShiny = db.Column(db.Boolean, nullable=False)
     enemyPkmnHP = db.Column(db.Integer, nullable=False)
-    enemyPkmnDamageTaken = db.Column(db.Integer, nullable=False)
-    enemyPkmnMove = db.Column(db.Integer, nullable=False)
-    enemyPkmnLevel = db.Column(db.Integer, nullable=False)
-    enemyPkmnPosition = db.Column(db.Integer, nullable=False)
+    turnDescription = db.Column(db.String, nullable=False)
 
     def __init__(
         self,
         battleID,
         playerPkmnID,
-        playerPkmnShiny,
         playerPkmnHP,
-        playerPkmnDamageTaken,
-        playerPkmnMove,
-        playerPkmnLevel,
-        playerPkmnPosition,
         enemyPkmnID,
-        enemyPkmnShiny,
         enemyPkmnHP,
-        enemyPkmnDamageTaken,
-        enemyPkmnMove,
-        enemyPkmnLevel,
-        enemyPkmnPosition,
+        turnDescription,
+        
     ):
         self.battleID = battleID
         self.playerPkmnID = playerPkmnID
-        self.playerPkmnShiny = playerPkmnShiny
         self.playerPkmnHP = playerPkmnHP
-        self.playerPkmnDamageTaken = playerPkmnDamageTaken
-        self.playerPkmnMove = playerPkmnMove
-        self.playerPkmnLevel = playerPkmnLevel
-        self.playerPkmnPosition = playerPkmnPosition
         self.enemyPkmnID = enemyPkmnID
-        self.enemyPkmnShiny = enemyPkmnShiny
         self.enemyPkmnHP = enemyPkmnHP
-        self.enemyPkmnDamageTaken = enemyPkmnDamageTaken
-        self.enemyPkmnMove = enemyPkmnMove
-        self.enemyPkmnLevel = enemyPkmnLevel
-        self.enemyPkmnPosition = enemyPkmnPosition
+        self.turnDescription = turnDescription
+        
 
 
 class TurnDescription(db.Model):
