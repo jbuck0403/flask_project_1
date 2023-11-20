@@ -156,7 +156,7 @@ def tallGrass():
             canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
 
             if "battlePkmnBtn" in request.form:
-                return redirect(url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=0, battleID=0))
+                return redirect(url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=0, battleID=0, firstTurn=1))
 
             elif "catchPkmnBtn" in request.form:
                 if canCatch:
