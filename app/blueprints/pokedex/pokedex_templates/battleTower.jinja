@@ -4,6 +4,10 @@
 {% endblock title %}
 {% block content %}
   {% if allTeams %}
-    {% for teamName in allTeams.keys() %}<div>{{ teamName }}</div>{% endfor %}
+    {% for teamName in allTeams.keys() %}
+      <a href="{{ url_for('pokedexBP.battle', pkmnID=1, trainerID=allTeams[teamName][0][0].trainerID) }}"
+         class="btn link-btn">{{ teamName }}</a>
+    {% endfor %}
+    {# {% for teamName in allTeams.keys() %}<div>{{ teamName }}</div>{% endfor %} #}
   {% endif %}
 {% endblock content %}

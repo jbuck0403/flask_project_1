@@ -1,4 +1,15 @@
 import copy, random, math
+from app.models import (
+    db,
+    Battle,
+    Turn,
+    TurnDescription,
+    Pkmn,
+    PkmnMoves,
+    PkmnTeam,
+    User,
+)
+from flask_login import current_user
 
 
 class PokemonBattle:
@@ -133,6 +144,9 @@ class PokemonBattle:
             pkmn.scaledHP = (pkmn.baseHP * 2 + 31) * (level / 100) + 10 + level
 
         return pkmn
+
+    def battleRunner(playerTeam, enemyTeam, battle):
+        pass
 
     def battle(
         self,

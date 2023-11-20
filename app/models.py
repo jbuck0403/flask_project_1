@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash
 from sqlalchemy.orm import relationship
 
+
 db = SQLAlchemy()
 
 
@@ -11,7 +12,9 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     userName = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
-    dateCreated = db.Column(db.Date, nullable=False, default=datetime.utcnow())
+    dateCreated = db.Column(
+        db.DateTime, nullable=False, default=datetime.utcnow()
+    )
     favoritePkmn = db.Column(db.String(10))
 
     def __init__(self, userName, password):
@@ -227,28 +230,77 @@ class UnownLetters(db.Model):
         self.spriteShiny = spriteShiny
 
 
-class BattleLog(db.Model):
+class Battle(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    battleID = db.Column(db.Integer, nullable=False)
-    turnID = db.Column(db.Integer, nullable=False)
     playerID = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     enemyID = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    dateTime = db.Column(db.DateTime, default=datetime.utcnow())
+
+    def __init__(self, playerID, enemyID):
+        self.playerID = playerID
+        self.enemyID = enemyID
+
+
+class Turn(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    battleID = db.Column(db.Integer, db.ForeignKey("battle.id"), nullable=False)
     playerPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
-    enemyPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
+    playerPkmnShiny = db.Column(db.Boolean, nullable=False)
     playerPkmnHP = db.Column(db.Integer, nullable=False)
+    playerPkmnDamageTaken = db.Column(db.Integer, nullable=False)
+    playerPkmnMove = db.Column(db.Integer, nullable=False)
+    playerPkmnLevel = db.Column(db.Integer, nullable=False)
+    playerPkmnPosition = db.Column(db.Integer, nullable=False)
+    enemyPkmnID = db.Column(db.Integer, db.ForeignKey("pkmn.id"), nullable=False)
+    enemyPkmnShiny = db.Column(db.Boolean, nullable=False)
     enemyPkmnHP = db.Column(db.Integer, nullable=False)
+    enemyPkmnDamageTaken = db.Column(db.Integer, nullable=False)
+    enemyPkmnMove = db.Column(db.Integer, nullable=False)
+    enemyPkmnLevel = db.Column(db.Integer, nullable=False)
+    enemyPkmnPosition = db.Column(db.Integer, nullable=False)
+
+    def __init__(
+        self,
+        battleID,
+        playerPkmnID,
+        playerPkmnShiny,
+        playerPkmnHP,
+        playerPkmnDamageTaken,
+        playerPkmnMove,
+        playerPkmnLevel,
+        playerPkmnPosition,
+        enemyPkmnID,
+        enemyPkmnShiny,
+        enemyPkmnHP,
+        enemyPkmnDamageTaken,
+        enemyPkmnMove,
+        enemyPkmnLevel,
+        enemyPkmnPosition,
+    ):
+        self.battleID = battleID
+        self.playerPkmnID = playerPkmnID
+        self.playerPkmnShiny = playerPkmnShiny
+        self.playerPkmnHP = playerPkmnHP
+        self.playerPkmnDamageTaken = playerPkmnDamageTaken
+        self.playerPkmnMove = playerPkmnMove
+        self.playerPkmnLevel = playerPkmnLevel
+        self.playerPkmnPosition = playerPkmnPosition
+        self.enemyPkmnID = enemyPkmnID
+        self.enemyPkmnShiny = enemyPkmnShiny
+        self.enemyPkmnHP = enemyPkmnHP
+        self.enemyPkmnDamageTaken = enemyPkmnDamageTaken
+        self.enemyPkmnMove = enemyPkmnMove
+        self.enemyPkmnLevel = enemyPkmnLevel
+        self.enemyPkmnPosition = enemyPkmnPosition
 
 
-class Battle(db.Models):
-    id
-    playerID
-    enemyID
+class TurnDescription(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    battleID = db.Column(db.Integer, db.ForeignKey("battle.id"), nullable=False)
+    turnID = db.Column(db.Integer, db.ForeignKey("turn.id"), nullable=False)
+    eventDescription = db.Column(db.String, nullable=False)
 
-
-class Turn(db.Models):
-    id
-    battleID
-    playerPkmn
-    enemyPlayerPkmn
-    playerPkmnHP
-    enemyPlayerPkmnHP
+    def __init__(self, battleID, turnID, eventDescription):
+        self.battleID = battleID
+        self.turnID = turnID
+        self.event = eventDescription

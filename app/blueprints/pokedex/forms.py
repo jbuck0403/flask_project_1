@@ -111,4 +111,5 @@ class PartyForm(FlaskForm):
 
             allTeamsWithPkmn[name] = teamsWithPkmn
 
+        breakpoint()
         return allTeamsWithPkmn

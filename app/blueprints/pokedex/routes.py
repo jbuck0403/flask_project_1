@@ -1,7 +1,7 @@
 from flask import request, render_template, flash, session, redirect, url_for
 import requests
 from .forms import PokedexInputForm, PartyForm
-from app.models import db, PkmnTeam, damageMovesLearnableByPokemon, PkmnMoves, Pkmn
+from app.models import db, PkmnTeam, damageMovesLearnableByPokemon, PkmnMoves, Pkmn, Battle
 from flask_login import current_user, login_required
 from .Pokedex import Pokedex
 from . import pokedexBP
@@ -241,9 +241,20 @@ def battle(pkmnID, trainerID):
     if previousRoute != None:
         previousRoute = previousRoute.split("/")
         previousRoute = previousRoute[len(previousRoute) - 1]
+        if previousRoute == 'tall_grass':
+            cameFromTallGrass = True
+        else:
+            cameFromTallGrass = False
+
+    if session.get('battleID') == None and not cameFromTallGrass:
+        battle = Battle(current_user.id, trainerID)
+        session['battleID'] = battle.id
+        db.session.add(battle)
+        db.session.commit()
 
     team = form.returnTeam()
-    if team:
+
+    if team and trainerID == 0:
         playerPkmn = Pkmn.query.get(team[0].pkmnID)
         playerPkmn.level = team[0].level
         playerPkmn.move = PkmnMoves.query.get(team[0].chosenMove)
@@ -258,9 +269,8 @@ def battle(pkmnID, trainerID):
             enemyTeam = form.returnTeam(enemyID=trainerID)
 
         outcome, winner = match.battle(playerPkmn, enemyPkmn)
-        winnerRemainingHP = winner.scaledHP
-        session["winnerRemainingHP"] = winnerRemainingHP
-        breakpoint()
+        
+        
 
         if previousRoute == "tall_grass":
             nextRoute = url_for("pokedexBP.tallGrass")
