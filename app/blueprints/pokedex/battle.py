@@ -158,17 +158,16 @@ class PokemonBattle:
         return pkmn
 
     def checkWinner(self, playerTeam, enemyTeam, turn):
-        breakpoint()
-        if playerTeam[(len(playerTeam)) - 1].pkmnID == turn.playerPkmnID:
+        if playerTeam[-1].pkmnID == turn.playerPkmnID:
             if turn.playerPkmnHP <= 0:
                 session['winner'] = enemyTeam[0].trainerID
-                breakpoint()
+                # breakpoint()
                 return True
                 
-        elif enemyTeam[(len(enemyTeam)) - 1].pkmnID == turn.enemyPkmnID:
+        elif enemyTeam[- 1].pkmnID == turn.enemyPkmnID:
             if turn.enemyPkmnHP <= 0:
                 session['winner'] = playerTeam[0].trainerID
-                breakpoint()
+                # breakpoint()
                 return True
         
         return False
@@ -176,6 +175,8 @@ class PokemonBattle:
 
     def teamBattle(self, playerTeam, enemyTeam, battleID, firstTurn):
        
+        battleLog = []
+
         if firstTurn == 1:
             playerPkmn = playerTeam[0]
             enemyPkmn = enemyTeam[0]
@@ -203,8 +204,8 @@ class PokemonBattle:
                 
                                 session['playerPkmnID'] = playerPkmn.pkmnID
                                 session['enemyPkmnID'] = enemyPkmn.pkmnID
-                                
                                 battleLog = self.duel(playerPkmn, enemyPkmn, battleID, enemyPkmnRemainingHealth=lastTurn.enemyPkmnHP)
+                                breakpoint()
                                 break
 
             if not pokemonSet:
@@ -218,25 +219,14 @@ class PokemonBattle:
                                     
                                     session['playerPkmnID'] = playerPkmn.pkmnID
                                     session['enemyPkmnID'] = enemyPkmn.pkmnID
-                                    
                                     battleLog = self.duel(playerPkmn, enemyPkmn, battleID, playerPkmnRemainingHealth=lastTurn.playerPkmnHP)
+                                    breakpoint()
                                     break
 
         currentTurn = db.session.query(Turn).filter(Turn.battleID == battleID).order_by(Turn.id.desc()).first()
         self.checkWinner(playerTeam, enemyTeam, currentTurn)
-        
+        breakpoint()
         return battleLog
-                                
-
-
-            # if player pokemon from last turn has <= 0 hp
-            #   playerPkmn = next pokemon in line
-            #   enemyPkmn = enemy pokemon from last turn
-            #   pass enemy pokemon from last turn HP into duel
-            # elif enemy pokemon from last turn has <= hp
-            #   enemyPkmn = next pokemon in line
-            #   playerPkmn = player pokemon from last turn
-            #   pass player pokemon from last turn HP into duel
 
     def duel(
         self,

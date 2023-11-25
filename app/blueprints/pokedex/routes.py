@@ -283,7 +283,8 @@ def battle(pkmnID, trainerID, battleID, firstTurn):
             nextRoute = url_for("pokedexBP.tallGrass")
 
         else:
-            
+            enemyTeam = form.returnTeam(enemyID=trainerID)
+      
             if firstTurn == 1:
                 if session.get('playerPkmnID'):
                     session.pop('playerPkmnID')
@@ -296,30 +297,24 @@ def battle(pkmnID, trainerID, battleID, firstTurn):
                 db.session.add(battle)  # add to the battle table
                 db.session.commit()
                 battleID = battle.id
-            
-            enemyTeam = form.returnTeam(
-                enemyID=trainerID
-            )  # get the enemy team from tainerID
-            
-            
+
+            nextRoute = url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=trainerID, battleID=battleID, firstTurn=0)
+            outcome = match.teamBattle(team, enemyTeam, battleID, firstTurn)
+
             if firstTurn == 1:
                 playerPkmn = Pkmn.query.filter_by(id=team[0].pkmn.id).first()
                 enemyPkmn = Pkmn.query.filter_by(id=enemyTeam[0].pkmn.id).first()
             else:
                 playerPkmn = Pkmn.query.filter_by(id=session.get('playerPkmnID')).first()
-                enemyPkmn = Pkmn.query.filter_by(id=session.get('enemyPkmnID')).first()
-            
-            
-            nextRoute = url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=trainerID, battleID=battleID, firstTurn=0)
-            outcome = match.teamBattle(team, enemyTeam, battleID, firstTurn)
-
+                enemyPkmn = Pkmn.query.filter_by(id=session.get('enemyPkmnID')).first()    
         
+        breakpoint()
         return render_template(
                 "battle.jinja",
                 form=form,
                 playerPkmn=playerPkmn,
                 enemyPkmn=enemyPkmn,
-                outcome=outcome.split('/'),
+                outcome=outcome.split('/') if len(outcome) > 0 else "",
                 nextRoute=nextRoute,
             )
 
