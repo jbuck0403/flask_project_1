@@ -259,7 +259,6 @@ class Turn(db.Model):
         enemyPkmnID,
         enemyPkmnHP,
         turnDescription,
-        
     ):
         self.battleID = battleID
         self.playerPkmnID = playerPkmnID
@@ -267,7 +266,6 @@ class Turn(db.Model):
         self.enemyPkmnID = enemyPkmnID
         self.enemyPkmnHP = enemyPkmnHP
         self.turnDescription = turnDescription
-        
 
 
 class TurnDescription(db.Model):

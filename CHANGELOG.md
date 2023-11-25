@@ -72,3 +72,9 @@ CHANGELOG 14
 - added ability to battle pokemon
 - now randomly assign newly caught pokemon a learnable move
 - added page to battle random pokemon
+
+CHANGELOG 15
+
+- added page to see other account teams
+- added ability to fight other account teams
+- can now remove favorite pokemon

@@ -128,7 +128,7 @@ class PokemonBattle:
             * typeModifier
         )
 
-        crit = random.randint(0,10001)
+        crit = random.randint(0, 10001)
         if crit <= 417:
             damage *= 2
             crit = True
@@ -158,41 +158,54 @@ class PokemonBattle:
         return pkmn
 
     def checkWinner(self, playerTeam, enemyTeam, turn):
-        if playerTeam[-1].pkmnID == turn.playerPkmnID:
-            if turn.playerPkmnHP <= 0:
-                session['winner'] = enemyTeam[0].trainerID
+        print("ENTERED CHECKWINNER")
+        if turn.playerPkmnHP <= 0:
+            if playerTeam[-1].pkmnID == turn.playerPkmnID:
+                enemyUserName = (
+                    db.session.query(User)
+                    .filter(User.id == enemyTeam[0].trainerID)
+                    .first()
+                    .userName
+                )
+                session["winnerMessage"] = f"You were defeated by {enemyUserName}..."
+                # breakpoint()
+                print("WINNER", enemyTeam[0].trainerID)
+                return True
+
+        elif turn.enemyPkmnHP <= 0:
+            if enemyTeam[-1].pkmnID == turn.enemyPkmnID:
+                enemyUserName = (
+                    db.session.query(User)
+                    .filter(User.id == enemyTeam[0].trainerID)
+                    .first()
+                    .userName
+                )
+                session["winnerMessage"] = f"You won against {enemyUserName}!"
+                print("WINNER", playerTeam[0].trainerID)
                 # breakpoint()
                 return True
-                
-        elif enemyTeam[- 1].pkmnID == turn.enemyPkmnID:
-            if turn.enemyPkmnHP <= 0:
-                session['winner'] = playerTeam[0].trainerID
-                # breakpoint()
-                return True
-        
+
         return False
-                
 
     def teamBattle(self, playerTeam, enemyTeam, battleID, firstTurn):
-       
         battleLog = []
 
         if firstTurn == 1:
             playerPkmn = playerTeam[0]
             enemyPkmn = enemyTeam[0]
-           
+
             battleLog = self.duel(playerPkmn, enemyPkmn, battleID)
-        
+
         else:
             lastTurn = (
                 db.session.query(Turn)
                 .filter(Turn.battleID == battleID)
                 .order_by(Turn.id.desc())
                 .first()
-                )
-            
+            )
+
             pokemonSet = False
-            
+
             for idx, playerPokemon in enumerate(playerTeam):
                 if playerPokemon.pkmnID == lastTurn.playerPkmnID:
                     if lastTurn.playerPkmnHP <= 0:
@@ -201,11 +214,16 @@ class PokemonBattle:
                             if pokemon.pkmnID == lastTurn.enemyPkmnID:
                                 enemyPkmn = pokemon
                                 pokemonSet = True
-                
-                                session['playerPkmnID'] = playerPkmn.pkmnID
-                                session['enemyPkmnID'] = enemyPkmn.pkmnID
-                                battleLog = self.duel(playerPkmn, enemyPkmn, battleID, enemyPkmnRemainingHealth=lastTurn.enemyPkmnHP)
-                                breakpoint()
+
+                                session["playerPkmnID"] = playerPkmn.pkmnID
+                                session["enemyPkmnID"] = enemyPkmn.pkmnID
+                                battleLog = self.duel(
+                                    playerPkmn,
+                                    enemyPkmn,
+                                    battleID,
+                                    enemyPkmnRemainingHealth=lastTurn.enemyPkmnHP,
+                                )
+                                # breakpoint()
                                 break
 
             if not pokemonSet:
@@ -213,19 +231,29 @@ class PokemonBattle:
                     if enemyPokemon.pkmnID == lastTurn.enemyPkmnID:
                         if lastTurn.enemyPkmnHP <= 0:
                             enemyPkmn = enemyTeam[idx + 1]
-                            for pokemon in enemyTeam:
+                            for pokemon in playerTeam:
                                 if pokemon.pkmnID == lastTurn.playerPkmnID:
                                     playerPkmn = pokemon
-                                    
-                                    session['playerPkmnID'] = playerPkmn.pkmnID
-                                    session['enemyPkmnID'] = enemyPkmn.pkmnID
-                                    battleLog = self.duel(playerPkmn, enemyPkmn, battleID, playerPkmnRemainingHealth=lastTurn.playerPkmnHP)
-                                    breakpoint()
+
+                                    session["playerPkmnID"] = playerPkmn.pkmnID
+                                    session["enemyPkmnID"] = enemyPkmn.pkmnID
+                                    battleLog = self.duel(
+                                        playerPkmn,
+                                        enemyPkmn,
+                                        battleID,
+                                        playerPkmnRemainingHealth=lastTurn.playerPkmnHP,
+                                    )
+                                    # breakpoint()
                                     break
 
-        currentTurn = db.session.query(Turn).filter(Turn.battleID == battleID).order_by(Turn.id.desc()).first()
+        currentTurn = (
+            db.session.query(Turn)
+            .filter(Turn.battleID == battleID)
+            .order_by(Turn.id.desc())
+            .first()
+        )
         self.checkWinner(playerTeam, enemyTeam, currentTurn)
-        breakpoint()
+        # breakpoint()
         return battleLog
 
     def duel(
@@ -235,7 +263,7 @@ class PokemonBattle:
         battleID=False,
         playerPkmnRemainingHealth=False,
         enemyPkmnRemainingHealth=False,
-        level=100
+        level=100,
     ):
         """have 2 pokemon fight until one faints"""
 
@@ -248,15 +276,18 @@ class PokemonBattle:
 
             return False
 
-        pokemon1 = self.returnScaledPokemon(playerPkmn, level, playerPkmnRemainingHealth, battleID)
-        pokemon2 = self.returnScaledPokemon(enemyPkmn, level, enemyPkmnRemainingHealth, battleID)
-        
+        pokemon1 = self.returnScaledPokemon(
+            playerPkmn, level, playerPkmnRemainingHealth, battleID
+        )
+        pokemon2 = self.returnScaledPokemon(
+            enemyPkmn, level, enemyPkmnRemainingHealth, battleID
+        )
+
         pokemon1.move = playerPkmn.move
         pokemon2.move = enemyPkmn.move
 
         battleLog = []
 
-        
         firstRound = True
         while pokemon1.scaledHP > 0 and pokemon2.scaledHP > 0:
             if firstRound:
@@ -285,7 +316,6 @@ class PokemonBattle:
             else:
                 battleLog.append(f"{attacker.name} missed.")
 
-        
         if defender.scaledHP > attacker.scaledHP:
             winner = defender
             fainted = attacker.name
@@ -297,13 +327,20 @@ class PokemonBattle:
         battleLog.append(f"{fainted} fainted.")
         if not battleID:
             battleLog.append(f"{winner.name} wins!")
-        
-        battleLog = '/'.join(battleLog)
-        
+
+        battleLog = "/".join(battleLog)
+
         if battleID:
-            currentTurn = Turn(battleID, pokemon1.id, pokemon1.scaledHP, pokemon2.id, pokemon2.scaledHP, battleLog)
+            currentTurn = Turn(
+                battleID,
+                pokemon1.id,
+                pokemon1.scaledHP,
+                pokemon2.id,
+                pokemon2.scaledHP,
+                battleLog,
+            )
             db.session.add(currentTurn)
             db.session.commit()
-            print("!!!!!!!!!!!!!!!",currentTurn.id)
+            print("!!!!!!!!!!!!!!!", currentTurn.id)
 
         return battleLog

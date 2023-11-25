@@ -156,7 +156,15 @@ def tallGrass():
             canCatch = form.returnTeam(numInTeam=True) < 6 and not pkmnID in trainerPkmn
 
             if "battlePkmnBtn" in request.form:
-                return redirect(url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=0, battleID=0, firstTurn=1))
+                return redirect(
+                    url_for(
+                        "pokedexBP.battle",
+                        pkmnID=pkmnID,
+                        trainerID=0,
+                        battleID=0,
+                        firstTurn=1,
+                    )
+                )
 
             elif "catchPkmnBtn" in request.form:
                 if canCatch:
@@ -238,19 +246,22 @@ def tallGrass():
     return render_template("tallGrass.jinja", form=form)
 
 
-@pokedexBP.route("/battle/<int:pkmnID>/<int:trainerID>/<int:battleID>/<int:firstTurn>", methods=["GET", "POST"])
+@pokedexBP.route(
+    "/battle/<int:pkmnID>/<int:trainerID>/<int:battleID>/<int:firstTurn>",
+    methods=["GET", "POST"],
+)
 @login_required
 def battle(pkmnID, trainerID, battleID, firstTurn):
     form = PartyForm()
     match = PokemonBattle()
 
-    if session.get('winner'):
-        flash(f"{session.pop('winner')} wins!")
-        if session.get('playerPkmnID'):
-            session.pop('playerPkmnID')
-        if session.get('enemyPkmnID'):
-            session.pop('enemyPkmnID')
-        return redirect(url_for('pokedexBP.battleTower'))
+    if session.get("winnerMessage"):
+        flash(f"{session.pop('winnerMessage')}")
+        if session.get("playerPkmnID"):
+            session.pop("playerPkmnID")
+        if session.get("enemyPkmnID"):
+            session.pop("enemyPkmnID")
+        return redirect(url_for("pokedexBP.battleTower"))
 
     previousRoute = request.headers.get("Referer")
     if previousRoute != None:
@@ -284,39 +295,47 @@ def battle(pkmnID, trainerID, battleID, firstTurn):
 
         else:
             enemyTeam = form.returnTeam(enemyID=trainerID)
-      
+
             if firstTurn == 1:
-                if session.get('playerPkmnID'):
-                    session.pop('playerPkmnID')
-                if session.get('enemyPkmnID'):
-                    session.pop('enemyPkmnID')
-                if session.get('winner'):
-                    session.pop('winner')
-            
+                if session.get("playerPkmnID"):
+                    session.pop("playerPkmnID")
+                if session.get("enemyPkmnID"):
+                    session.pop("enemyPkmnID")
+                if session.get("winner"):
+                    session.pop("winner")
+
                 battle = Battle(current_user.id, trainerID)  # start the battle
                 db.session.add(battle)  # add to the battle table
                 db.session.commit()
                 battleID = battle.id
 
-            nextRoute = url_for("pokedexBP.battle", pkmnID=pkmnID, trainerID=trainerID, battleID=battleID, firstTurn=0)
+            nextRoute = url_for(
+                "pokedexBP.battle",
+                pkmnID=pkmnID,
+                trainerID=trainerID,
+                battleID=battleID,
+                firstTurn=0,
+            )
             outcome = match.teamBattle(team, enemyTeam, battleID, firstTurn)
 
             if firstTurn == 1:
                 playerPkmn = Pkmn.query.filter_by(id=team[0].pkmn.id).first()
                 enemyPkmn = Pkmn.query.filter_by(id=enemyTeam[0].pkmn.id).first()
             else:
-                playerPkmn = Pkmn.query.filter_by(id=session.get('playerPkmnID')).first()
-                enemyPkmn = Pkmn.query.filter_by(id=session.get('enemyPkmnID')).first()    
-        
-        breakpoint()
+                playerPkmn = Pkmn.query.filter_by(
+                    id=session.get("playerPkmnID")
+                ).first()
+                enemyPkmn = Pkmn.query.filter_by(id=session.get("enemyPkmnID")).first()
+
+        # breakpoint()
         return render_template(
-                "battle.jinja",
-                form=form,
-                playerPkmn=playerPkmn,
-                enemyPkmn=enemyPkmn,
-                outcome=outcome.split('/') if len(outcome) > 0 else "",
-                nextRoute=nextRoute,
-            )
+            "battle.jinja",
+            form=form,
+            playerPkmn=playerPkmn,
+            enemyPkmn=enemyPkmn,
+            outcome=outcome.split("/") if len(outcome) > 0 else "",
+            nextRoute=nextRoute,
+        )
 
     else:
         flash("Team is currently empty...", "warning")
